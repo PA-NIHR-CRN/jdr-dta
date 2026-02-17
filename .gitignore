@@ -1,0 +1,50 @@
+## User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.doccache
+
+# Specific user settings file requested for exclusion
+appsettings.user.json
+
+## Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+## Visual Studio / Rider / MSBuild
+.vs/
+.idea/
+*.sln.DotSettings.user
+_ReSharper*/
+*.VC.db
+*.VC.opendb
+
+## NuGet Packages
+*.nupkg
+# The packages folder can be ignored as they are restored from the .csproj
+**/packages/*
+!**/packages/build/
+
+## Docker
+.dockerignore
+
+## OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

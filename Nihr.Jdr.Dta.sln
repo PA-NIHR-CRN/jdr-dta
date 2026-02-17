@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nihr.Jdr.Dta.Job", "Nihr.Jdr.Dta.Job\Nihr.Jdr.Dta.Job.csproj", "{355377C6-6CB8-4B90-8D34-F99E7877B9CD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nihr.Jdr.Dta.Domain", "Nihr.Jdr.Dta.Domain\Nihr.Jdr.Dta.Domain.csproj", "{832F9C7C-4A82-4BAF-AC9F-9C9A5DF33B53}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nihr.Jdr.Dta.Infrastructure", "Nihr.Jdr.Dta.Infrastructure\Nihr.Jdr.Dta.Infrastructure.csproj", "{54BAC61A-31EE-4178-B5FF-BC5D9922FA61}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{355377C6-6CB8-4B90-8D34-F99E7877B9CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{355377C6-6CB8-4B90-8D34-F99E7877B9CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{355377C6-6CB8-4B90-8D34-F99E7877B9CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{355377C6-6CB8-4B90-8D34-F99E7877B9CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{832F9C7C-4A82-4BAF-AC9F-9C9A5DF33B53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{832F9C7C-4A82-4BAF-AC9F-9C9A5DF33B53}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{832F9C7C-4A82-4BAF-AC9F-9C9A5DF33B53}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{832F9C7C-4A82-4BAF-AC9F-9C9A5DF33B53}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54BAC61A-31EE-4178-B5FF-BC5D9922FA61}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54BAC61A-31EE-4178-B5FF-BC5D9922FA61}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54BAC61A-31EE-4178-B5FF-BC5D9922FA61}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54BAC61A-31EE-4178-B5FF-BC5D9922FA61}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
