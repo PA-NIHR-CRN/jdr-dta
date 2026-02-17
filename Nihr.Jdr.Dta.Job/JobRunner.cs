@@ -25,7 +25,6 @@ public class JobRunner(
             {
                 await ProcessBatch(batch, ct);
                 totalProcessed += batch.Count;
-                logger.LogInformation("Synchronized {Count} records...", totalProcessed);
                 batch.Clear();
             }
         }

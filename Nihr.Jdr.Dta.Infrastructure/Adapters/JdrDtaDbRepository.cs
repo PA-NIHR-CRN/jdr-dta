@@ -28,8 +28,6 @@ public class JdrDtaDbRepository(JdrDtaDbContext dbContext) : IJdrDtaDbRepository
     public async Task PersistBatchAsync(CancellationToken ct)
     {
         await dbContext.SaveChangesAsync(ct);
-
-        // Critical: Clear tracker to maintain performance during large jobs
         dbContext.ChangeTracker.Clear();
     }
 }
