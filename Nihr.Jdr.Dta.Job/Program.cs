@@ -1,18 +1,11 @@
-﻿using Google.Apis.Auth.OAuth2;
-using Google.Cloud.SecretManager.V1;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
-using Nihr.Jdr.Dta.Domain.Interfaces;
-using Nihr.Jdr.Dta.Infrastructure.Adapters;
-using Nihr.Jdr.Dta.Infrastructure.DAL;
-using Nihr.Jdr.Dta.Infrastructure.Settings;
+using Microsoft.Extensions.Logging;
+using Nihr.Jdr.Dta.Job.Startup;
 
 namespace Nihr.Jdr.Dta.Job;
 
-internal static class Program
+internal class Program
 {
     private static async Task<int> Main(string[] args)
     {
@@ -22,41 +15,25 @@ internal static class Program
 
             builder.AddNihrConfiguration();
             builder.ConfigureNihrLogging();
-
-            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-                                   ?? throw new InvalidOperationException(
-                                       "Missing ConnectionStrings:DefaultConnection");
-
-            builder.Services.AddDbContext<JdrDtaDbContext>(o => o.UseSqlServer(connectionString));
-
-            builder.Services.GetSectionAndValidate<JdrDbSettings>(builder.Configuration);
-
-            builder.Services.AddScoped(service =>
-            {
-                var googleSdkSettings = service.GetRequiredService<IOptions<JdrDbSettings>>().Value;
-
-                var googleSdkCredential =
-                    CredentialFactory.FromJson<ServiceAccountCredential>(googleSdkSettings.JdrGcpSettings
-                        .ServiceAccountKey);
-
-                return new SecretManagerServiceClientBuilder { Credential = googleSdkCredential }.Build();
-            });
-
-            builder.Services.AddScoped<IExternalJdrDbCredentialProvider, ExternalJdrDbCredentialProvider>();
-            builder.Services.AddScoped<IExternalJdrDbRepository, ExternalJdrDbRepository>();
-            builder.Services.AddScoped<IJdrDtaDbRepository, JdrDtaDbRepository>();
-            builder.Services.AddScoped<JobRunner>();
+            builder.ConfigureDependencyInjection();
 
             var host = builder.Build();
 
+            var logger = host.Services.GetRequiredService<ILogger<Program>>();
+
+            logger.LogInformation("Application host built. Starting job execution");
+
             using var scope = host.Services.CreateScope();
             var job = scope.ServiceProvider.GetRequiredService<JobRunner>();
+
             var result = await job.RunAsync();
 
-            return 0;
+            logger.LogInformation("Job execution finished with result: {Result}", result);
+            return result;
         }
         catch (Exception e)
         {
+            Console.Error.WriteLine("Critical error during application startup:");
             Console.Error.WriteLine(e);
             return 1;
         }

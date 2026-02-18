@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Nihr.Jdr.Dta.Infrastructure.DAL;
 
@@ -11,9 +12,11 @@ using Nihr.Jdr.Dta.Infrastructure.DAL;
 namespace Nihr.Jdr.Dta.Infrastructure.DAL.Migrations
 {
     [DbContext(typeof(JdrDtaDbContext))]
-    partial class JdrDtaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260217183435_UpdateNullableFields")]
+    partial class UpdateNullableFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

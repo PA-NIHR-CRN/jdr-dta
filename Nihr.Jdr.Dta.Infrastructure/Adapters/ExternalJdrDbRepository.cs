@@ -1,5 +1,5 @@
 using System.Runtime.CompilerServices;
-using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using Nihr.Jdr.Dta.Domain.Entities;
 using Nihr.Jdr.Dta.Domain.Interfaces;
@@ -8,17 +8,39 @@ using Nihr.Jdr.Dta.Infrastructure.Helpers;
 
 namespace Nihr.Jdr.Dta.Infrastructure.Adapters;
 
-public class ExternalJdrDbRepository(IExternalJdrDbCredentialProvider externalJdrDbCredentialProvider)
+public class ExternalJdrDbRepository(
+    IExternalJdrDbCredentialProvider externalJdrDbCredentialProvider,
+    ILogger<ExternalJdrDbRepository> logger)
     : IExternalJdrDbRepository
 {
     public async IAsyncEnumerable<Person> GetExternalVolunteerAsync(
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        await using var connection =
-            new MySqlConnection(await externalJdrDbCredentialProvider.GetConnectionString(cancellationToken));
-        await connection.OpenAsync(cancellationToken);
+        logger.LogInformation("Starting retrieval of external volunteers from JDR database");
 
-        // Could make this a stored procedure in the JDR database?
+        string connectionString;
+        try
+        {
+            connectionString = await externalJdrDbCredentialProvider.GetConnectionString(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to retrieve connection string for external JDR database");
+            throw;
+        }
+
+        await using var connection = new MySqlConnection(connectionString);
+        try
+        {
+            await connection.OpenAsync(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to open connection to external JDR database");
+            throw;
+        }
+
+        logger.LogDebug("Executing query to fetch volunteers: {Query}", ExternalJdrDbQueries.GetVolunteers);
         await using var command = new MySqlCommand(ExternalJdrDbQueries.GetVolunteers, connection);
         await using var reader = await command.ExecuteReaderAsync(cancellationToken);
 
@@ -38,6 +60,9 @@ public class ExternalJdrDbRepository(IExternalJdrDbCredentialProvider externalJd
         var ordDiagnosisYear = reader.GetOrdinal(ExternalJdrDbColumns.DiagnosisYear);
         var ordDiagnosisMonth = reader.GetOrdinal(ExternalJdrDbColumns.DiagnosisMonth);
         var ordSubtypeDiagnosis = reader.GetOrdinal(ExternalJdrDbColumns.SubtypeDiagnosis);
+        var ordSymptomsBeginMonth = reader.GetOrdinal(ExternalJdrDbColumns.SymptomsBeginMonth);
+        var ordSymptomsBeginYear = reader.GetOrdinal(ExternalJdrDbColumns.SymptomsBeginYear);
+        var ordSymptomsLevel = reader.GetOrdinal(ExternalJdrDbColumns.SymptomsLevel);
         var ordPositiveAmyloidPlaque = reader.GetOrdinal(ExternalJdrDbColumns.PositiveAmyloidPlaque);
         var ordPositiveApoe4 = reader.GetOrdinal(ExternalJdrDbColumns.PositiveApoe4);
         var ordMmseMonth = reader.GetOrdinal(ExternalJdrDbColumns.MmseMonth);
@@ -75,6 +100,14 @@ public class ExternalJdrDbRepository(IExternalJdrDbCredentialProvider externalJd
             var diagnosisYear = reader.IsDBNull(ordDiagnosisYear) ? (int?)null : reader.GetInt32(ordDiagnosisYear);
             var diagnosisMonth = reader.IsDBNull(ordDiagnosisMonth) ? (int?)null : reader.GetInt32(ordDiagnosisMonth);
             var subtypeDiagnosis = reader.IsDBNull(ordSubtypeDiagnosis) ? null : reader.GetString(ordSubtypeDiagnosis);
+            var symptomsMonth = reader.IsDBNull(ordSymptomsBeginMonth)
+                ? (int?)null
+                : reader.GetInt32(ordSymptomsBeginMonth);
+            var symptomsYear = reader.IsDBNull(ordSymptomsBeginYear)
+                ? (int?)null
+                : reader.GetInt32(ordSymptomsBeginYear);
+            var symptomsLevel = reader.IsDBNull(ordSymptomsLevel) ? null : reader.GetString(ordSymptomsLevel);
+
             var positiveAmyloidPlaque = reader.IsDBNull(ordPositiveAmyloidPlaque)
                 ? null
                 : reader.GetString(ordPositiveAmyloidPlaque);
@@ -113,6 +146,11 @@ public class ExternalJdrDbRepository(IExternalJdrDbCredentialProvider externalJd
                     DiagnosisDate = CreateDateFromYearMonth(diagnosisYear, diagnosisMonth),
                     PositiveAmyloidPlaque = positiveAmyloidPlaque.GetNonEmptyString(),
                     PositiveApoe4 = positiveApoe4.GetNonEmptyString()
+                },
+                Symptom = new Symptom
+                {
+                    StartDate = CreateDateFromYearMonth(symptomsYear, symptomsMonth),
+                    Level = symptomsLevel.GetNonEmptyString()
                 },
                 Mmse = new Mmse
                 {

@@ -29,6 +29,9 @@ public static class ExternalJdrDbColumns
     public const string MocaMonth = "MocaMonth";
     public const string MocaYear = "MocaYear";
     public const string MocaScore = "MocaScore";
+    public const string SymptomsBeginMonth = "SymptomsBeginMonth";
+    public const string SymptomsBeginYear = "SymptomsBeginYear";
+    public const string SymptomsLevel = "SymptomsLevel";
 }
 
 public static class ExternalJdrDbQueries
@@ -51,6 +54,9 @@ public static class ExternalJdrDbQueries
                                             m.volunteer_diagnosis_date_year AS 'DiagnosisYear',
                                             m.volunteer_diagnosis_date_month AS 'DiagnosisMonth',
                                             m.subtype_diagnosis AS 'SubtypeDiagnosis',
+                                            m.symptoms_begin_date_month 'SymptomsBeginMonth',
+                                            m.symptoms_begin_date_year 'SymptomsBeginYear',
+                                            m.symptoms_level 'SymptomsLevel',
                                             m.positive_amyloid_plaque AS 'PositiveAmyloidPlaque',
                                             m.positive_apoe4 AS 'PositiveApoe4',
                                             m.mmse_date_month AS 'MmseMonth',

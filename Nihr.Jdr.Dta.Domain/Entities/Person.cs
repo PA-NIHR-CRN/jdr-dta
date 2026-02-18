@@ -15,10 +15,10 @@ public class Person : ISoftDelete, ITimestamped
     public DateTime UpdatedAt { get; set; }
     public bool IsDeleted { get; set; }
 
-    public Appointment Appointment { get; set; }
-    public Diagnosis Diagnosis { get; set; }
-    public Symptom Symptom { get; set; }
-    public Mmse Mmse { get; set; }
-    public Moca Moca { get; set; }
-    public Ace Ace { get; set; }
+    public required Appointment Appointment { get; set; }
+    public required Diagnosis Diagnosis { get; set; }
+    public required Symptom Symptom { get; set; }
+    public required Mmse Mmse { get; set; }
+    public required Moca Moca { get; set; }
+    public required Ace Ace { get; set; }
 }

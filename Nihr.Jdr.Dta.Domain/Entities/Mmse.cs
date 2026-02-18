@@ -5,11 +5,11 @@ namespace Nihr.Jdr.Dta.Domain.Entities;
 public class Mmse : ISoftDelete, ITimestamped
 {
     public int Id { get; set; }
-    
-    public Person Person { get; set; }
+
+    public Person Person { get; set; } = null!;
     public int PersonId { get; set; }
 
-    
+
     public DateTime? Date { get; set; }
     public int? Score { get; set; }
     public bool IsDeleted { get; set; }

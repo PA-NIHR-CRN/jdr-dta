@@ -19,6 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="DAL\Deployment\" />
       <Folder Include="DAL\Migrations\" />
     </ItemGroup>
 

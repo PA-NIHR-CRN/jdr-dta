@@ -6,7 +6,7 @@ public class Appointment : ISoftDelete, ITimestamped
 {
     public int Id { get; set; }
 
-    public Person Person { get; set; }
+    public Person Person { get; set; } = null!;
     public int PersonId { get; set; }
 
 
