@@ -31,3 +31,27 @@ As each record is received, the infrastructure layer transforms the JDR-specific
 
 #### 3. Batch Writing
 To ensure the process is efficient, the transformed records are grouped into batches (for example, 500 at a time) before being written to the SQL Server staging database. For every record in a batch, the application checks whether it already exists in the destination. If the record is found, it is updated; otherwise, a new entry is created. After each batch is successfully saved, the application clears its internal tracking state. This ensures that the memory used by the application remains stable.
+
+### Managing Schema
+
+You can use **JetBrains Rider** (or the `dotnet ef` CLI) to manage migrations in this project. When adding a new migration, ensure the following project roles are set:
+
+*   **Startup Project**: `Nihr.Jdr.Dta.Job`
+*   **Migrations Project**: `Nihr.Jdr.Dta.Infrastructure`
+*   **Output Directory**: `DAL/Migrations`
+
+If using the command line, the command looks like this:
+
+```bash
+dotnet ef migrations add --project Nihr.Jdr.Dta.Infrastructure/Nihr.Jdr.Dta.Infrastructure.csproj --startup-project Nihr.Jdr.Dta.Job/Nihr.Jdr.Dta.Job.csproj --context Nihr.Jdr.Dta.Infrastructure.DAL.JdrDtaDbContext --configuration Debug <MigrationName> --output-dir DAL/Migrations
+```
+
+#### Deployment and Schema Updates
+
+To keep the production and UAT environments in sync without requiring the .NET SDK or EF tools on the target servers, we generate **idempotent SQL scripts**.
+
+1.  **Script Generation**: We generate a SQL script that includes logic to check which migrations have already been applied before executing new ones.
+    ```bash
+    dotnet ef migrations script --idempotent --output ./Nihr.Jdr.Dta.Infrastructure/DAL/Deployment/Deploy.sql --project Nihr.Jdr.Dta.Infrastructure --startup-project Nihr.Jdr.Dta.Job
+    ```
+2.  **Deployment Pipeline**: This generated `Deploy.sql` script is used within our CI/CD pipeline. The pipeline executes this script against the target database as a pre-deployment step, ensuring the schema is up to date before the new version of the application starts.

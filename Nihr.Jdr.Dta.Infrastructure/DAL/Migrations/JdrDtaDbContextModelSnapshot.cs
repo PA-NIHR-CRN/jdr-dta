@@ -53,7 +53,7 @@ namespace Nihr.Jdr.Dta.Infrastructure.DAL.Migrations
                     b.HasIndex("PersonId")
                         .IsUnique();
 
-                    b.ToTable("Ace");
+                    b.ToTable("Ace", (string)null);
                 });
 
             modelBuilder.Entity("Nihr.Jdr.Dta.Domain.Entities.Appointment", b =>
@@ -108,7 +108,7 @@ namespace Nihr.Jdr.Dta.Infrastructure.DAL.Migrations
                     b.HasIndex("PersonId")
                         .IsUnique();
 
-                    b.ToTable("Appointment");
+                    b.ToTable("Appointment", (string)null);
                 });
 
             modelBuilder.Entity("Nihr.Jdr.Dta.Domain.Entities.Diagnosis", b =>
@@ -151,7 +151,7 @@ namespace Nihr.Jdr.Dta.Infrastructure.DAL.Migrations
                     b.HasIndex("PersonId")
                         .IsUnique();
 
-                    b.ToTable("Diagnosis");
+                    b.ToTable("Diagnosis", (string)null);
                 });
 
             modelBuilder.Entity("Nihr.Jdr.Dta.Domain.Entities.Mmse", b =>
@@ -185,7 +185,7 @@ namespace Nihr.Jdr.Dta.Infrastructure.DAL.Migrations
                     b.HasIndex("PersonId")
                         .IsUnique();
 
-                    b.ToTable("Mmse");
+                    b.ToTable("Mmse", (string)null);
                 });
 
             modelBuilder.Entity("Nihr.Jdr.Dta.Domain.Entities.Moca", b =>
@@ -219,7 +219,7 @@ namespace Nihr.Jdr.Dta.Infrastructure.DAL.Migrations
                     b.HasIndex("PersonId")
                         .IsUnique();
 
-                    b.ToTable("Moca");
+                    b.ToTable("Moca", (string)null);
                 });
 
             modelBuilder.Entity("Nihr.Jdr.Dta.Domain.Entities.Person", b =>
@@ -250,7 +250,7 @@ namespace Nihr.Jdr.Dta.Infrastructure.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Person");
+                    b.ToTable("Person", (string)null);
                 });
 
             modelBuilder.Entity("Nihr.Jdr.Dta.Domain.Entities.Symptom", b =>
@@ -284,7 +284,7 @@ namespace Nihr.Jdr.Dta.Infrastructure.DAL.Migrations
                     b.HasIndex("PersonId")
                         .IsUnique();
 
-                    b.ToTable("Symptom");
+                    b.ToTable("Symptom", (string)null);
                 });
 
             modelBuilder.Entity("Nihr.Jdr.Dta.Domain.Entities.Ace", b =>
