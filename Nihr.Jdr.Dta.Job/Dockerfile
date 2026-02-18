@@ -9,7 +9,7 @@ ARG SECRETS_ENABLED
 ENV AwsSecretsManagerSettings__SecretName=${AWS_SECRET}
 ENV AwsSecretsManagerSettings__Enabled=${SECRETS_ENABLED}
 ENV AwsSecretsManagerSettings__Region=${AWS_REGION}
-ENV ASPNETCORE_Environment=Production
+ENV DOTNET_ENVIRONMENT=Production
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG NUGET_PACKAGE_USERNAME

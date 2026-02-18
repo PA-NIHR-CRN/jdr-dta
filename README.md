@@ -32,6 +32,8 @@ As each record is received, the infrastructure layer transforms the JDR-specific
 #### 3. Batch Writing
 To ensure the process is efficient, the transformed records are grouped into batches (for example, 500 at a time) before being written to the SQL Server staging database. For every record in a batch, the application checks whether it already exists in the destination. If the record is found, it is updated; otherwise, a new entry is created. After each batch is successfully saved, the application clears its internal tracking state. This ensures that the memory used by the application remains stable.
 
+---
+
 ### Managing Schema
 
 You can use **JetBrains Rider** (or the `dotnet ef` CLI) to manage migrations in this project. When adding a new migration, ensure the following project roles are set:
