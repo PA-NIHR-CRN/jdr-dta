@@ -6,13 +6,6 @@ on:
       - main
   workflow_dispatch:
 
-env:
-  AWS_REGION_2: eu-west-2
-  AwsSecretsManagerSettings__SecretName: ${{ secrets.AWS_SECRET_NAME }}
-  AwsSecretsManagerSettings__Enabled: ${{ vars.SECRETS_ENABLED }}
-  AwsSecretsManagerSettings__Region: ${{ vars.AWS_REGION }}
-  DOTNET_ENVIRONMENT: "Production"
-
 jobs:
   build:
     name: "Setup .NET"
