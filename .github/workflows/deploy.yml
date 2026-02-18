@@ -43,12 +43,11 @@ jobs:
           IMAGE_NAME_TAG: jdr-dta
           IMAGE_SHA_TAG: jdr-dta-${{ github.sha }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          AWS_SECRET_NAME: ${{ secrets.AWS_SECRET_NAME }}
         run: |
           echo "Using registry ${{ env.ECR_REGISTRY }}"
           echo "Tagging image with ${{ env.IMAGE_NAME_TAG }} and ${{ env.IMAGE_SHA_TAG }}"
 
-          docker build -f Nihr.Jdr.Dta.Job/Dockerfile -t "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG" --build-arg "NUGET_PACKAGE_USERNAME=USERNAME" --build-arg "NUGET_PACKAGE_TOKEN=$GITHUB_TOKEN" --build-arg "AWS_SECRET=$AWS_SECRET_NAME" --build-arg "AWS_REGION=${{ vars.AWS_REGION }}" --build-arg "SECRETS_ENABLED=${{ vars.SECRETS_ENABLED }}" -t "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG" .
+          docker build -f Nihr.Jdr.Dta.Job/Dockerfile -t "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG" --build-arg "NUGET_PACKAGE_USERNAME=USERNAME" --build-arg "NUGET_PACKAGE_TOKEN=$GITHUB_TOKEN" -t "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG" .
           docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
 
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG" >> "$GITHUB_OUTPUT"
