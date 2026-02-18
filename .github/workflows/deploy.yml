@@ -7,17 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    name: "Setup .NET"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: "10.0.x"
-
   deploy-uat:
-    needs: [build]
     environment: UAT
     name: "Deploy UAT"
     runs-on: ubuntu-latest
