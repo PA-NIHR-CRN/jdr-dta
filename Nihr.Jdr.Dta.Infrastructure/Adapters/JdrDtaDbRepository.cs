@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Nihr.Jdr.Dta.Domain.Entities;
 using Nihr.Jdr.Dta.Domain.Interfaces;
 using Nihr.Jdr.Dta.Infrastructure.DAL;
+using Z.EntityFramework.Plus;
 
 namespace Nihr.Jdr.Dta.Infrastructure.Adapters;
 
@@ -68,6 +69,11 @@ public class JdrDtaDbRepository(
         existingVolunteer.Ace.Score = incomingVolunteer.Ace.Score;
 
         return Task.CompletedTask;
+    }
+
+    public async Task DeleteAsync(CancellationToken ct)
+    {
+        dbContext.Persons.Delete();
     }
 
     public async Task PersistBatchAsync(CancellationToken ct)
