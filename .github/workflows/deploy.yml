@@ -83,21 +83,19 @@ jobs:
             DB_CREDS, ${{ secrets.AWS_DB_SECRET_NAME }}
           parse-json-secrets: true
 
-      - name: Run SQL Deployment Script
-        uses: azure/sql-action@v2.3
-        with:
-          connection-string: "${{ env.DB_CREDS_CONNECTIONSTRING }}"
-          path: "./Nihr.Jdr.Dta.Infrastructure/DAL/Deployment/Deploy.sql"
+      - name: Install sqlcmd
+        run: |
+          curl -L https://github.com/microsoft/go-sqlcmd/releases/download/v1.9.0/sqlcmd-linux-arm64.tar.bz2 | tar -xj
+          sudo mv sqlcmd /usr/local/bin/
 
-      # - name: Run SQL Deployment Script
-      #   run: |
-      #     sqlcmd -S "${{ secrets.RDS_ENDPOINT }}" \
-      #            -U "${{ env.DB_CREDS_USERNAME }}" \
-      #            -P "${{ env.DB_CREDS_PASSWORD }}" \
-      #            -d "JdrDta" \
-      #            -i "./Nihr.Jdr.Dta.Infrastructure/DAL/Deployment/Deploy.sql"
+      - name: Run Migration Script
+        run: |
+          sqlcmd --endpoint "${{ secrets.RDS_ENDPOINT }}" \
+                 --username "${{ env.DB_CREDS_USERNAME }}" \
+                 --password "${{ env.DB_CREDS_PASSWORD }}" \
+                 --database "JdrDta" \
+                 --input-file "./Nihr.Jdr.Dta.Infrastructure/DAL/Deployment/Deploy.sql"
 
-      # 6. Cleanup: Remove IP from Security Group (Runs even if previous steps fail)
       - name: Revoke Runner IP
         if: always()
         run: |
