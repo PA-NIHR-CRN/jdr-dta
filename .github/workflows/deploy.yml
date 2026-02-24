@@ -85,7 +85,7 @@ jobs:
 
       - name: Install sqlcmd
         run: |
-          curl -L https://github.com/microsoft/go-sqlcmd/releases/download/v1.9.0/sqlcmd-linux-arm64.tar.bz2 | tar -xj
+          curl -L https://github.com/microsoft/go-sqlcmd/releases/download/v1.9.0/sqlcmd-linux-amd64.tar.bz2 | tar -xj
           sudo mv sqlcmd /usr/local/bin/
 
       - name: Run Migration Script
