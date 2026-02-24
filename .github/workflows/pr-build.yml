@@ -1,4 +1,4 @@
-name: pr-build
+name: Build PR
 on:
     workflow_dispatch:
     pull_request:
