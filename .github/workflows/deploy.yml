@@ -86,7 +86,7 @@ jobs:
       - name: Run SQL Deployment Script
         uses: azure/sql-action@v2.3
         with:
-          connection-string: "${{ env.DB_CREDS_CONNECTION_STRING }}"
+          connection-string: "${{ env.DB_CREDS_CONNECTIONSTRING }}"
           path: "./Nihr.Jdr.Dta.Infrastructure/DAL/Deployment/Deploy.sql"
 
       # - name: Run SQL Deployment Script
