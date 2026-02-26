@@ -11,7 +11,8 @@ public class JobRunner(
     ILogger<JobRunner> logger)
 {
     private const int BatchSize = 500;
-
+    private readonly HashSet<int> _incomingVolunteerIds = [];
+    
     public async Task<int> RunAsync(CancellationToken ct = default)
     {
         var stopwatch = Stopwatch.StartNew();
@@ -41,6 +42,8 @@ public class JobRunner(
                 await ProcessBatch(batch, ct);
                 totalProcessed += batch.Count;
             }
+
+            await jdrDtaDbRepository.RemoveVolunteersNotInAsync(_incomingVolunteerIds, ct);
 
             stopwatch.Stop();
 
@@ -78,6 +81,8 @@ public class JobRunner(
 
         foreach (var incoming in batch)
         {
+            _incomingVolunteerIds.Add(incoming.JdrVolunteerId);
+            
             if (existingPersons.TryGetValue(incoming.JdrVolunteerId, out var existing))
             {
                 await jdrDtaDbRepository.UpdateVolunteerAsync(existing, incoming, ct);

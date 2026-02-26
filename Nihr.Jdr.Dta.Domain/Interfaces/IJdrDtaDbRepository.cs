@@ -11,4 +11,6 @@ public interface IJdrDtaDbRepository
     Task UpdateVolunteerAsync(Person existingVolunteer, Person incomingVolunteer, CancellationToken cancellationToken);
 
     Task PersistBatchAsync(CancellationToken cancellationToken);
+    
+    Task RemoveVolunteersNotInAsync(IReadOnlySet<int> incomingVolunteerIds, CancellationToken cancellationToken);
 }
