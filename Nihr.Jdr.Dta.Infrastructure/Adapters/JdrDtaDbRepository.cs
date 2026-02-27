@@ -86,10 +86,9 @@ public class JdrDtaDbRepository(
         }
     }
 
-    public async Task RemoveVolunteersNotInAsync(IReadOnlySet<int> incomingVolunteerIds, CancellationToken cancellationToken)
+    public async Task DeleteVolunteersNotInSourceAsync(IReadOnlySet<int> incomingVolunteerIds, CancellationToken cancellationToken)
     {
         var activeVolunteerIds = await dbContext.Persons
-            .Where(p => !p.IsDeleted)
             .Select(p => p.JdrVolunteerId)
             .ToListAsync(cancellationToken);
 
@@ -106,7 +105,6 @@ public class JdrDtaDbRepository(
         logger.LogDebug("Removing {Count} volunteers", volunteerIdsToRemove.Count);
 
         var volunteersToRemove = await dbContext.Persons
-            .Where(p => !p.IsDeleted)
             .Where(p => volunteerIdsToRemove.Contains(p.JdrVolunteerId))
             .ToListAsync(cancellationToken);
         

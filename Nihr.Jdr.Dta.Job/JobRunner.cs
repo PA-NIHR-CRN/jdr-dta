@@ -43,7 +43,7 @@ public class JobRunner(
                 totalProcessed += batch.Count;
             }
 
-            await jdrDtaDbRepository.RemoveVolunteersNotInAsync(_incomingVolunteerIds, ct);
+            await jdrDtaDbRepository.DeleteVolunteersNotInSourceAsync(_incomingVolunteerIds, ct);
 
             stopwatch.Stop();
 
