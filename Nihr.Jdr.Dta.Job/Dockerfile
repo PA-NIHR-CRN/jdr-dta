@@ -2,25 +2,15 @@
 USER $APP_UID
 WORKDIR /app
 
-ENV DOTNET_ENVIRONMENT=Production
-
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
-ARG NUGET_PACKAGE_USERNAME
-ARG NUGET_PACKAGE_TOKEN
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["Nihr.Jdr.Dta.Job/Nihr.Jdr.Dta.Job.csproj", "Nihr.Jdr.Dta.Job/"]
-RUN dotnet nuget add source --username $NUGET_PACKAGE_USERNAME --password $NUGET_PACKAGE_TOKEN --store-password-in-clear-text --name github "https://nuget.pkg.github.com/pa-nihr-crn/index.json"
-RUN dotnet restore "Nihr.Jdr.Dta.Job/Nihr.Jdr.Dta.Job.csproj"
 COPY . .
-WORKDIR "/src/Nihr.Jdr.Dta.Job"
-RUN dotnet build "./Nihr.Jdr.Dta.Job.csproj" -c $BUILD_CONFIGURATION -o /app/build
-
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Nihr.Jdr.Dta.Job.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+WORKDIR Nihr.Jdr.Dta.Job
+RUN --mount=type=secret,id=nuget-credentials-pa-nihr-crn,env=NuGetPackageSourceCredentials_pa_nihr_crn \
+dotnet publish -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
-COPY --from=publish /app/publish .
+COPY --from=build /app/publish .
 ENTRYPOINT ["dotnet", "Nihr.Jdr.Dta.Job.dll"]
