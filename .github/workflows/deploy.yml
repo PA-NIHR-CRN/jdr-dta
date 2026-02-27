@@ -88,7 +88,7 @@ jobs:
 
       - name: Install sqlcmd
         run: |
-          curl -L https://github.com/microsoft/go-sqlcmd/releases/download/v1.9.0/sqlcmd-linux-amd64.tar.bz2 | tar -xj
+          curl --proto '=https' --tlsv1.2 -L https://github.com/microsoft/go-sqlcmd/releases/download/v1.9.0/sqlcmd-linux-amd64.tar.bz2 | tar -xj
           sudo mv sqlcmd /usr/local/bin/
 
       - name: Get Public IP
