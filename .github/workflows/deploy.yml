@@ -61,6 +61,8 @@ jobs:
           docker build -f Nihr.Jdr.Dta.Job/Dockerfile -t "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG" -t "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG" --secret id=nuget-credentials-pa-nihr-crn,env=NuGetPackageSourceCredentials_pa_nihr_crn .
           docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
 
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG" >> "$GITHUB_OUTPUT"
+
       - name: Get AWS Account ID
         run: echo "ACCOUNT_ID=$(aws sts get-caller-identity --query 'Account' --output text)" >> $GITHUB_ENV
 
@@ -69,6 +71,7 @@ jobs:
           sed -i "s/__ACCOUNT_ID__/${ACCOUNT_ID}/g" ${{ env.ECS_TASK_DEFINITION }}
           sed -i "s/__ENVIRONMENT__/${{ vars.ENVIRONMENT_STAGE }}/g" ${{ env.ECS_TASK_DEFINITION }}
           sed -i "s/__ACCOUNT_PREFIX__/${{ vars.ACCOUNT_PREFIX }}/g" ${{ env.ECS_TASK_DEFINITION }}
+          
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
 
@@ -89,6 +92,7 @@ jobs:
           sudo mv sqlcmd /usr/local/bin/
 
       - name: Get Public IP
+        if: always()
         id: ip
         run: echo "ipv4=$(curl -s https://checkip.amazonaws.com)" >> $GITHUB_OUTPUT
 
