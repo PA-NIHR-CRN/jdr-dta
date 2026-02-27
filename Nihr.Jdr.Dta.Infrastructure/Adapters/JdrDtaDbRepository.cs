@@ -105,6 +105,12 @@ public class JdrDtaDbRepository(
         logger.LogDebug("Removing {Count} volunteers", volunteerIdsToRemove.Count);
 
         var volunteersToRemove = await dbContext.Persons
+            .Include(p => p.Appointment)
+            .Include(p => p.Diagnosis)
+            .Include(p => p.Symptom)
+            .Include(p => p.Mmse)
+            .Include(p => p.Moca)
+            .Include(p => p.Ace)
             .Where(p => volunteerIdsToRemove.Contains(p.JdrVolunteerId))
             .ToListAsync(cancellationToken);
         
