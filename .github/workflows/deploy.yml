@@ -7,8 +7,8 @@ on:
   workflow_dispatch:
 
 env:
-    ECS_TASK_DEFINITION: ${{ github.workspace }}/Nihr.Jdr.Dta.Infrastructure/.aws/ecs-task-definition.json
-    CONTAINER_NAME: ${{ vars.ACCOUNT_PREFIX }}-ecs-${{ vars.ENVIRONMENT_STAGE }}-jdr-dta-container
+  ECS_TASK_DEFINITION: ${{ github.workspace }}/Nihr.Jdr.Dta.Infrastructure/.aws/ecs-task-definition.json
+  CONTAINER_NAME: ${{ vars.ACCOUNT_PREFIX }}-ecs-${{ vars.ENVIRONMENT_STAGE }}-jdr-dta-container
 
 jobs:
   deploy-uat:
@@ -25,7 +25,7 @@ jobs:
           aws-access-key-id: ${{ secrets.NIHR_GITHUB_ACTIONS_IAM_ID }}
           aws-secret-access-key: ${{ secrets.NIHR_GITHUB_ACTIONS_IAM_SECRET }}
           aws-region: ${{ vars.AWS_REGION }}
-      
+
       - name: Configure AWS credentials (uat)
         uses: aws-actions/configure-aws-credentials@v6.0.0
         if: vars.ENVIRONMENT_STAGE  == 'uat'
@@ -33,7 +33,7 @@ jobs:
           aws-access-key-id: ${{ secrets.CRNCC_STAGING_IAM_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.CRNCC_STAGING_IAM_ACCESS_KEY_SECRET }}
           aws-region: ${{ vars.AWS_REGION }}
-      
+
       - name: Configure AWS credentials (oat/prod)
         uses: aws-actions/configure-aws-credentials@v6.0.0
         if: vars.ENVIRONMENT_STAGE == 'oat' || vars.ENVIRONMENT_STAGE  == 'prod'
@@ -71,7 +71,7 @@ jobs:
           sed -i "s/__ACCOUNT_ID__/${ACCOUNT_ID}/g" ${{ env.ECS_TASK_DEFINITION }}
           sed -i "s/__ENVIRONMENT__/${{ vars.ENVIRONMENT_STAGE }}/g" ${{ env.ECS_TASK_DEFINITION }}
           sed -i "s/__ACCOUNT_PREFIX__/${{ vars.ACCOUNT_PREFIX }}/g" ${{ env.ECS_TASK_DEFINITION }}
-          
+
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
 
@@ -97,9 +97,11 @@ jobs:
         run: echo "ipv4=$(curl -s https://checkip.amazonaws.com)" >> $GITHUB_OUTPUT
 
       - name: Whitelist Runner IP
+        env:
+          RDS_SECURITY_GROUP_ID: ${{ secrets.RDS_SECURITY_GROUP_ID }}
         run: |
           aws ec2 authorize-security-group-ingress \
-            --group-id ${{ secrets.RDS_SECURITY_GROUP_ID }} \
+            --group-id ${{ env.RDS_SECURITY_GROUP_ID }} \
             --protocol tcp --port 1433 \
             --cidr ${{ steps.ip.outputs.ipv4 }}/32
 
@@ -111,8 +113,10 @@ jobs:
           parse-json-secrets: true
 
       - name: Run Migration Script
+        env:
+          RDS_ENDPOINT: ${{ secrets.RDS_ENDPOINT }}
         run: |
-          sqlcmd -S "${{ secrets.RDS_ENDPOINT }}" \
+          sqlcmd -S "${{ env.RDS_ENDPOINT }}" \
                  -U "${{ env.DB_CREDS_USERNAME }}" \
                  -P "${{ env.DB_CREDS_PASSWORD }}" \
                  -d "JdrDta" \
@@ -120,9 +124,11 @@ jobs:
 
       - name: Revoke Runner IP
         if: always()
+        env:
+          RDS_SECURITY_GROUP_ID: ${{ secrets.RDS_SECURITY_GROUP_ID }}
         run: |
           aws ec2 revoke-security-group-ingress \
-            --group-id ${{ secrets.RDS_SECURITY_GROUP_ID }} \
+            --group-id ${{ env.RDS_SECURITY_GROUP_ID }} \
             --protocol tcp --port 1433 \
             --cidr ${{ steps.ip.outputs.ipv4 }}/32
 
