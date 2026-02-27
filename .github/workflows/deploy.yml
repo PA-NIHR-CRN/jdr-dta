@@ -67,7 +67,7 @@ jobs:
       - name: Replace placeholders in task definition
         run: |
           sed -i "s/__ACCOUNT_ID__/${ACCOUNT_ID}/g" ${{ env.ECS_TASK_DEFINITION }}
-          sed -i "s/__ENVIRONMENT__/${{ inputs.environment }}/g" ${{ env.ECS_TASK_DEFINITION }}
+          sed -i "s/__ENVIRONMENT__/${{ vars.ENVIRONMENT_STAGE }}/g" ${{ env.ECS_TASK_DEFINITION }}
           sed -i "s/__ACCOUNT_PREFIX__/${{ vars.ACCOUNT_PREFIX }}/g" ${{ env.ECS_TASK_DEFINITION }}
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
