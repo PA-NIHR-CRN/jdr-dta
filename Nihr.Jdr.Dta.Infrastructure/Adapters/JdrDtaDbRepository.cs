@@ -91,4 +91,37 @@ public class JdrDtaDbRepository(
             throw;
         }
     }
+
+    public async Task DeleteVolunteersNotInSourceAsync(IReadOnlySet<int> incomingVolunteerIds, CancellationToken cancellationToken)
+    {
+        var activeVolunteerIds = await dbContext.Persons
+            .Select(p => p.JdrVolunteerId)
+            .ToListAsync(cancellationToken);
+
+        var volunteerIdsToRemove = activeVolunteerIds
+            .Where(id => !incomingVolunteerIds.Contains(id))
+            .ToList();
+
+        if (volunteerIdsToRemove.Count == 0)
+        {
+            logger.LogDebug("No volunteers to remove");
+            return;
+        }
+        
+        logger.LogDebug("Removing {Count} volunteers", volunteerIdsToRemove.Count);
+
+        var volunteersToRemove = await dbContext.Persons
+            .Include(p => p.Appointment)
+            .Include(p => p.Diagnosis)
+            .Include(p => p.Symptom)
+            .Include(p => p.Mmse)
+            .Include(p => p.Moca)
+            .Include(p => p.Ace)
+            .Where(p => volunteerIdsToRemove.Contains(p.JdrVolunteerId))
+            .ToListAsync(cancellationToken);
+        
+        dbContext.Persons.RemoveRange(volunteersToRemove);
+
+        await PersistBatchAsync(cancellationToken);
+    }
 }
