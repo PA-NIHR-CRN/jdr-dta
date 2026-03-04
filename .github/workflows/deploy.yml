@@ -6,139 +6,20 @@ on:
       - main
   workflow_dispatch:
 
-env:
-  ECS_TASK_DEFINITION: ${{ github.workspace }}/Nihr.Jdr.Dta.Infrastructure/.aws/ecs-task-definition.json
-  CONTAINER_NAME: ${{ vars.ACCOUNT_PREFIX }}-ecs-${{ vars.ENVIRONMENT_STAGE }}-jdr-dta-container
-
 jobs:
   deploy-uat:
-    environment: UAT
-    name: "Deploy UAT"
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v6.0.2
+    uses: ./.github/workflows/deploy-template.yml
+    with:
+      environment: UAT
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.CRNCC_STAGING_IAM_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.CRNCC_STAGING_IAM_ACCESS_KEY_SECRET }}
 
-      - name: Configure AWS credentials (dev/test)
-        uses: aws-actions/configure-aws-credentials@v6.0.0
-        if: vars.ENVIRONMENT_STAGE == 'dev' || vars.ENVIRONMENT_STAGE == 'test'
-        with:
-          aws-access-key-id: ${{ secrets.NIHR_GITHUB_ACTIONS_IAM_ID }}
-          aws-secret-access-key: ${{ secrets.NIHR_GITHUB_ACTIONS_IAM_SECRET }}
-          aws-region: ${{ vars.AWS_REGION }}
-
-      - name: Configure AWS credentials (uat)
-        uses: aws-actions/configure-aws-credentials@v6.0.0
-        if: vars.ENVIRONMENT_STAGE  == 'uat'
-        with:
-          aws-access-key-id: ${{ secrets.CRNCC_STAGING_IAM_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.CRNCC_STAGING_IAM_ACCESS_KEY_SECRET }}
-          aws-region: ${{ vars.AWS_REGION }}
-
-      - name: Configure AWS credentials (oat/prod)
-        uses: aws-actions/configure-aws-credentials@v6.0.0
-        if: vars.ENVIRONMENT_STAGE == 'oat' || vars.ENVIRONMENT_STAGE  == 'prod'
-        with:
-          aws-access-key-id: ${{ secrets.CRNCC_PROD_IAM_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.CRNCC_PROD_IAM_ACCESS_KEY_SECRET }}
-          aws-region: ${{ vars.AWS_REGION }}
-
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2.0.1
-
-      - name: Build, tag, and push image to Amazon ECR
-        id: build-image
-        env:
-          ECR_REPOSITORY: ${{ vars.ACCOUNT_PREFIX }}-ecr-repo-${{ vars.ENVIRONMENT_STAGE }}-jdr-dta
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_NAME_TAG: jdr-dta
-          IMAGE_SHA_TAG: jdr-dta-${{ github.sha }}
-          NuGetPackageSourceCredentials_pa_nihr_crn: "Username=USERNAME;Password=${{ secrets.GITHUB_TOKEN }}"
-        run: |
-          echo "Using registry ${{ env.ECR_REGISTRY }}"
-          echo "Tagging image with ${{ env.IMAGE_NAME_TAG }} and ${{ env.IMAGE_SHA_TAG }}"
-
-          docker build -f Nihr.Jdr.Dta.Job/Dockerfile -t "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG" -t "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG" --secret id=nuget-credentials-pa-nihr-crn,env=NuGetPackageSourceCredentials_pa_nihr_crn .
-          docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
-
-          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG" >> "$GITHUB_OUTPUT"
-
-      - name: Get AWS Account ID
-        run: echo "ACCOUNT_ID=$(aws sts get-caller-identity --query 'Account' --output text)" >> $GITHUB_ENV
-
-      - name: Replace placeholders in task definition
-        run: |
-          sed -i "s/__ACCOUNT_ID__/${ACCOUNT_ID}/g" ${{ env.ECS_TASK_DEFINITION }}
-          sed -i "s/__ENVIRONMENT__/${{ vars.ENVIRONMENT_STAGE }}/g" ${{ env.ECS_TASK_DEFINITION }}
-          sed -i "s/__ACCOUNT_PREFIX__/${{ vars.ACCOUNT_PREFIX }}/g" ${{ env.ECS_TASK_DEFINITION }}
-
-      - name: Fill in the new image ID in the Amazon ECS task definition
-        id: task-def
-
-        uses: aws-actions/amazon-ecs-render-task-definition@v1.8.3
-        with:
-          task-definition: ${{ env.ECS_TASK_DEFINITION }}
-          container-name: ${{ env.CONTAINER_NAME }}
-          image: ${{ steps.build-image.outputs.image }}
-          environment-variables: |
-            AwsSecretsManagerSettings__SecretName=${{ secrets.AWS_SECRET_NAME }}
-            AwsSecretsManagerSettings__Enabled=${{ vars.SECRETS_ENABLED }}
-            AwsSecretsManagerSettings__Region=${{ vars.AWS_REGION }}
-            DOTNET_ENVIRONMENT=Production
-
-      - name: Install sqlcmd
-        run: |
-          curl --proto '=https' --tlsv1.2 -L https://github.com/microsoft/go-sqlcmd/releases/download/v1.9.0/sqlcmd-linux-amd64.tar.bz2 | tar -xj
-          sudo mv sqlcmd /usr/local/bin/
-
-      - name: Get Public IP
-        if: always()
-        id: ip
-        run: echo "ipv4=$(curl -s https://checkip.amazonaws.com)" >> $GITHUB_OUTPUT
-
-      - name: Whitelist Runner IP
-        env:
-          RDS_SECURITY_GROUP_ID: ${{ secrets.RDS_SECURITY_GROUP_ID }}
-        run: |
-          aws ec2 authorize-security-group-ingress \
-            --group-id ${{ env.RDS_SECURITY_GROUP_ID }} \
-            --protocol tcp --port 1433 \
-            --cidr ${{ steps.ip.outputs.ipv4 }}/32
-
-      - name: Get DB Secrets
-        uses: aws-actions/aws-secretsmanager-get-secrets@v2.0.10
-        with:
-          secret-ids: |
-            DB_CREDS, ${{ secrets.AWS_DB_SECRET_NAME }}
-          parse-json-secrets: true
-
-      - name: Run Migration Script
-        env:
-          RDS_ENDPOINT: ${{ secrets.RDS_ENDPOINT }}
-        run: |
-          sqlcmd -S "${{ env.RDS_ENDPOINT }}" \
-                 -U "${{ env.DB_CREDS_USERNAME }}" \
-                 -P "${{ env.DB_CREDS_PASSWORD }}" \
-                 -d "JdrDta" \
-                 -i "./Nihr.Jdr.Dta.Infrastructure/DAL/Deployment/Deploy.sql"
-
-      - name: Revoke Runner IP
-        if: always()
-        env:
-          RDS_SECURITY_GROUP_ID: ${{ secrets.RDS_SECURITY_GROUP_ID }}
-        run: |
-          aws ec2 revoke-security-group-ingress \
-            --group-id ${{ env.RDS_SECURITY_GROUP_ID }} \
-            --protocol tcp --port 1433 \
-            --cidr ${{ steps.ip.outputs.ipv4 }}/32
-
-      - name: Deploy Amazon ECS task definition
-        env:
-          ECS_SERVICE: ${{ vars.ACCOUNT_PREFIX }}-ecs-service-${{ vars.ENVIRONMENT_STAGE }}-jdr-dta
-          ECS_CLUSTER: ${{ vars.ACCOUNT_PREFIX }}-ecs-cluster-${{ vars.ENVIRONMENT_STAGE }}-jdr-dta
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v2.6.0
-        with:
-          task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: ${{ env.ECS_SERVICE }}
-          cluster: ${{ env.ECS_CLUSTER }}
-          wait-for-service-stability: true
+  deploy-prod:
+    needs: deploy-uat
+    uses: ./.github/workflows/deploy-template.yml
+    with:
+      environment: PROD
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.CRNCC_PROD_IAM_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.CRNCC_PROD_IAM_ACCESS_KEY_SECRET }}
