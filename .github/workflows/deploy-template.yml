@@ -79,15 +79,19 @@ jobs:
           curl --proto '=https' --tlsv1.2 -L https://github.com/microsoft/go-sqlcmd/releases/download/v1.9.0/sqlcmd-linux-amd64.tar.bz2 | tar -xj
           sudo mv sqlcmd /usr/local/bin/
 
-      - name: Whitelist Runner IP
+      - name: Get Public IP
+        if: always()
         id: ip
+        run: echo "ipv4=$(curl -s https://checkip.amazonaws.com)" >> $GITHUB_OUTPUT
+
+      - name: Whitelist Runner IP
+        env:
+          RDS_SECURITY_GROUP_ID: ${{ secrets.RDS_SECURITY_GROUP_ID }}
         run: |
-          IPV4=$(curl -s https://checkip.amazonaws.com)
-          echo "ipv4=$IPV4" >> $GITHUB_OUTPUT
           aws ec2 authorize-security-group-ingress \
-            --group-id ${{ secrets.RDS_SECURITY_GROUP_ID }} \
+            --group-id ${{ env.RDS_SECURITY_GROUP_ID }} \
             --protocol tcp --port 1433 \
-            --cidr $IPV4/32
+            --cidr ${{ steps.ip.outputs.ipv4 }}/32
 
       - name: Get DB Secrets
         uses: aws-actions/aws-secretsmanager-get-secrets@v2.0.10
