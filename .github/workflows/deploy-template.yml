@@ -109,8 +109,10 @@ jobs:
           parse-json-secrets: true
 
       - name: Run Migration Script
+        env:
+          RDS_ENDPOINT: ${{ secrets.RDS_ENDPOINT }}
         run: |
-          sqlcmd -S "${{ secrets.RDS_ENDPOINT }}" \
+          sqlcmd -S "${{ env.RDS_ENDPOINT }}" \
                  -U "${{ env.DB_CREDS_USERNAME }}" \
                  -P "${{ env.DB_CREDS_PASSWORD }}" \
                  -d "JdrDta" \
@@ -118,9 +120,11 @@ jobs:
 
       - name: Revoke Runner IP
         if: always()
+        env:
+          RDS_SECURITY_GROUP_ID: ${{ secrets.RDS_SECURITY_GROUP_ID }}
         run: |
           aws ec2 revoke-security-group-ingress \
-            --group-id ${{ secrets.RDS_SECURITY_GROUP_ID }} \
+            --group-id ${{ env.RDS_SECURITY_GROUP_ID }} \
             --protocol tcp --port 1433 \
             --cidr ${{ steps.ip.outputs.ipv4 }}/32
 
