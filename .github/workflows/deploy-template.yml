@@ -25,7 +25,7 @@ jobs:
     name: "Deploy ${{ inputs.environment }}"
     runs-on: ubuntu-24.04
     environment: ${{ inputs.environment }}
-    
+
     env:
       ECS_TASK_DEFINITION: ${{ github.workspace }}/Nihr.Jdr.Dta.Infrastructure/.aws/ecs-task-definition.json
       CONTAINER_NAME: ${{ vars.ACCOUNT_PREFIX }}-ecs-${{ vars.ENVIRONMENT_STAGE }}-jdr-dta-container
@@ -61,7 +61,10 @@ jobs:
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG" >> "$GITHUB_OUTPUT"
 
       - name: Get AWS Account ID
-        run: echo "ACCOUNT_ID=$(aws sts get-caller-identity --query 'Account' --output text)" >> $GITHUB_ENV
+        run: |
+          account=$(aws sts get-caller-identity --query 'Account' --output text)
+          echo "::add-mask::$account"
+          echo "ACCOUNT_ID=$account" >> "$GITHUB_OUTPUT"
 
       - name: Replace placeholders in task definition
         run: |
@@ -100,6 +103,7 @@ jobs:
             --group-id ${{ env.RDS_SECURITY_GROUP_ID }} \
             --protocol tcp --port 1433 \
             --cidr ${{ steps.ip.outputs.ipv4 }}/32
+            --output off
 
       - name: Get DB Secrets
         uses: aws-actions/aws-secretsmanager-get-secrets@v2.0.10
@@ -112,9 +116,9 @@ jobs:
         env:
           RDS_ENDPOINT: ${{ secrets.RDS_ENDPOINT }}
         run: |
-          sqlcmd -S "${{ env.RDS_ENDPOINT }}" \
-                 -U "${{ env.DB_CREDS_USERNAME }}" \
-                 -P "${{ env.DB_CREDS_PASSWORD }}" \
+          sqlcmd -S "${RDS_ENDPOINT}" \
+                 -U "${DB_CREDS_USERNAME}" \
+                 -P "${DB_CREDS_PASSWORD}" \
                  -d "JdrDta" \
                  -i "./Nihr.Jdr.Dta.Infrastructure/DAL/Deployment/Deploy.sql"
 
@@ -127,6 +131,7 @@ jobs:
             --group-id ${{ env.RDS_SECURITY_GROUP_ID }} \
             --protocol tcp --port 1433 \
             --cidr ${{ steps.ip.outputs.ipv4 }}/32
+            --output off
 
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2.6.0
