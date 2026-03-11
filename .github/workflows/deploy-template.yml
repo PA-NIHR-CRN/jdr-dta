@@ -64,7 +64,7 @@ jobs:
         run: |
           account=$(aws sts get-caller-identity --query 'Account' --output text)
           echo "::add-mask::$account"
-          echo "ACCOUNT_ID=$account" >> "$GITHUB_OUTPUT"
+          echo "ACCOUNT_ID=$account" >> $GITHUB_ENV
 
       - name: Replace placeholders in task definition
         run: |
