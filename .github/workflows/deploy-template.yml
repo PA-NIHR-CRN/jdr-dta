@@ -102,7 +102,7 @@ jobs:
           aws ec2 authorize-security-group-ingress \
             --group-id ${{ env.RDS_SECURITY_GROUP_ID }} \
             --protocol tcp --port 1433 \
-            --cidr ${{ steps.ip.outputs.ipv4 }}/32
+            --cidr ${{ steps.ip.outputs.ipv4 }}/32 \
             --output off
 
       - name: Get DB Secrets
@@ -130,7 +130,7 @@ jobs:
           aws ec2 revoke-security-group-ingress \
             --group-id ${{ env.RDS_SECURITY_GROUP_ID }} \
             --protocol tcp --port 1433 \
-            --cidr ${{ steps.ip.outputs.ipv4 }}/32
+            --cidr ${{ steps.ip.outputs.ipv4 }}/32 \
             --output off
 
       - name: Deploy Amazon ECS task definition
