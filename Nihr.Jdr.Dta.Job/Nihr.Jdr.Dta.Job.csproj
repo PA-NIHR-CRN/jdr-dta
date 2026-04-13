@@ -21,6 +21,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Nihr.Jdr.Dta.CarrotCdm\Nihr.Jdr.Dta.CarrotCdm.csproj" />
       <ProjectReference Include="..\Nihr.Jdr.Dta.Infrastructure\Nihr.Jdr.Dta.Infrastructure.csproj" />
     </ItemGroup>
 
