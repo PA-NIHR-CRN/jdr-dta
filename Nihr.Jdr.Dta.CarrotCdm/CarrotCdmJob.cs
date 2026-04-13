@@ -21,10 +21,8 @@ public sealed class CarrotCdmJob(
         {
             logger.LogInformation("Starting CarrotCDM job");
 
-            logger.LogInformation("Exporting source tables");
             await exporter.ExportAsync();
 
-            logger.LogInformation("Running CarrotCDM transform");
             var transformResult = await transformRunner.RunAsync();
             
             if (transformResult != 0)
@@ -33,10 +31,8 @@ public sealed class CarrotCdmJob(
                 return transformResult;
             }
 
-            logger.LogInformation("Recreating OMOP schema");
             await schemaCreator.CreateSchemaAsync(_options.DdlFile);
 
-            logger.LogInformation("Loading OMOP tables");
             await bulkLoader.ImportAsync();
 
             logger.LogInformation("CarrotCDM job completed successfully");

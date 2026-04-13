@@ -1,4 +1,5 @@
 using System.Data;
+using System.Globalization;
 
 namespace Nihr.Jdr.Dta.CarrotCdm.Readers;
 
@@ -20,7 +21,7 @@ public sealed class OmopObservationDateFixingReader(IDataReader inner) : IDataRe
             var dtRaw = inner.GetValue(datetimeIdx);
 
             if (dtRaw is string dtString &&
-                DateTime.TryParse(dtString, out var parsed))
+                DateTime.TryParse(dtString, CultureInfo.CurrentCulture, out var parsed))
             {
                 return parsed.Date;
             }
