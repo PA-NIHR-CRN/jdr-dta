@@ -32194,10 +32194,6 @@
     },
     "observation": {
       "Impaired mobility 4979293": {
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Disabilities"
-        },
         "observation_datetime": {
           "source_table": "Appointment.csv",
           "source_field": "DeclarationAcceptedDate"
@@ -32251,10 +32247,6 @@
           "term_mapping": {
             "Hearing impairment, Mobility problems": 4306934
           }
-        },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Disabilities"
         }
       },
       "Learning difficulties 4979300": {
@@ -32280,10 +32272,6 @@
             "Learning difficulties": 440382
           }
         },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Disabilities"
-        },
         "person_id": {
           "source_table": "Appointment.csv",
           "source_field": "PersonId"
@@ -32304,10 +32292,6 @@
         "person_id": {
           "source_table": "Appointment.csv",
           "source_field": "PersonId"
-        },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Disabilities"
         },
         "observation_source_concept_id": {
           "source_table": "Appointment.csv",
@@ -32330,10 +32314,6 @@
           }
         },
         "observation_source_value": {
-          "source_table": "Appointment.csv",
-          "source_field": "Disabilities"
-        },
-        "value_as_string": {
           "source_table": "Appointment.csv",
           "source_field": "Disabilities"
         },
@@ -32379,10 +32359,6 @@
           "term_mapping": {
             "Communication problems, Hearing impairment, Mobility problems": 4306934
           }
-        },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Disabilities"
         }
       },
       "Learning difficulties 4979311": {
@@ -32411,17 +32387,9 @@
           "term_mapping": {
             "Learning difficulties, Mobility problems": 440382
           }
-        },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Disabilities"
         }
       },
       "Impaired mobility 4979312": {
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Disabilities"
-        },
         "person_id": {
           "source_table": "Appointment.csv",
           "source_field": "PersonId"
@@ -32475,10 +32443,6 @@
           "term_mapping": {
             "Communication problems, Learning difficulties": 440382
           }
-        },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Disabilities"
         }
       },
       "Tinnitus 4979325": {
@@ -32501,10 +32465,6 @@
             "Tinnitus": 377575
           }
         },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "OtherDisabilities"
-        },
         "observation_source_concept_id": {
           "source_table": "Appointment.csv",
           "source_field": "OtherDisabilities",
@@ -32520,10 +32480,6 @@
           "term_mapping": {
             "Reduced mobility": 4306934
           }
-        },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "OtherDisabilities"
         },
         "observation_source_value": {
           "source_table": "Appointment.csv",
@@ -32571,17 +32527,9 @@
         "observation_source_value": {
           "source_table": "Appointment.csv",
           "source_field": "OtherMedicalConditions"
-        },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "OtherMedicalConditions"
         }
       },
       "Tinnitus 4981586": {
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "OtherMedicalConditions"
-        },
         "observation_concept_id": {
           "source_table": "Appointment.csv",
           "source_field": "OtherMedicalConditions",
@@ -32635,10 +32583,6 @@
         "observation_datetime": {
           "source_table": "Appointment.csv",
           "source_field": "DeclarationAcceptedDate"
-        },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "EthnicGroup"
         }
       },
       "White 4981615": {
@@ -32656,10 +32600,6 @@
         "observation_datetime": {
           "source_table": "Appointment.csv",
           "source_field": "DeclarationAcceptedDate"
-        },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "EthnicGroup"
         },
         "observation_source_value": {
           "source_table": "Appointment.csv",
@@ -32693,10 +32633,6 @@
           "source_table": "Appointment.csv",
           "source_field": "EthnicGroup"
         },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "EthnicGroup"
-        },
         "observation_concept_id": {
           "source_table": "Appointment.csv",
           "source_field": "EthnicGroup",
@@ -32718,10 +32654,6 @@
           }
         },
         "observation_source_value": {
-          "source_table": "Appointment.csv",
-          "source_field": "EthnicGroup"
-        },
-        "value_as_string": {
           "source_table": "Appointment.csv",
           "source_field": "EthnicGroup"
         },
@@ -32763,10 +32695,6 @@
         "observation_source_value": {
           "source_table": "Appointment.csv",
           "source_field": "EthnicGroup"
-        },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "EthnicGroup"
         }
       },
       "Any other mixed background 4981619": {
@@ -32784,10 +32712,6 @@
           "term_mapping": {
             "White and Black African (Mixed)": 35825477
           }
-        },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "EthnicGroup"
         },
         "person_id": {
           "source_table": "Appointment.csv",
@@ -32827,17 +32751,9 @@
         "person_id": {
           "source_table": "Appointment.csv",
           "source_field": "PersonId"
-        },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "EthnicGroup"
         }
       },
       "Black or Black British 4981621": {
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "EthnicGroup"
-        },
         "observation_source_concept_id": {
           "source_table": "Appointment.csv",
           "source_field": "EthnicGroup",
@@ -32891,17 +32807,9 @@
         "observation_source_value": {
           "source_table": "Appointment.csv",
           "source_field": "EthnicGroup"
-        },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "EthnicGroup"
         }
       },
       "Impaired mobility 4981635": {
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Disabilities"
-        },
         "observation_source_value": {
           "source_table": "Appointment.csv",
           "source_field": "Disabilities"
@@ -32933,10 +32841,6 @@
         "person_id": {
           "source_table": "Appointment.csv",
           "source_field": "PersonId"
-        },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Disabilities"
         },
         "observation_datetime": {
           "source_table": "Appointment.csv",
@@ -32984,10 +32888,6 @@
           "source_table": "Appointment.csv",
           "source_field": "DeclarationAcceptedDate"
         },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Disabilities"
-        },
         "observation_source_value": {
           "source_table": "Appointment.csv",
           "source_field": "Disabilities"
@@ -33015,10 +32915,6 @@
           "term_mapping": {
             "Communication problems, Hearing impairment, Mobility problems, Visual impairment": 4306934
           }
-        },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Disabilities"
         },
         "person_id": {
           "source_table": "Appointment.csv",
@@ -33051,10 +32947,6 @@
           "term_mapping": {
             "Mobility problems, Other disability (enter below), Visual impairment": 4306934
           }
-        },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Disabilities"
         }
       },
       "Impaired mobility 4981681": {
@@ -33070,10 +32962,6 @@
           }
         },
         "observation_source_value": {
-          "source_table": "Appointment.csv",
-          "source_field": "Disabilities"
-        },
-        "value_as_string": {
           "source_table": "Appointment.csv",
           "source_field": "Disabilities"
         },
@@ -33105,10 +32993,6 @@
           "source_table": "Appointment.csv",
           "source_field": "PersonId"
         },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Disabilities"
-        },
         "observation_source_value": {
           "source_table": "Appointment.csv",
           "source_field": "Disabilities"
@@ -33130,10 +33014,6 @@
           }
         },
         "observation_source_value": {
-          "source_table": "Appointment.csv",
-          "source_field": "Disabilities"
-        },
-        "value_as_string": {
           "source_table": "Appointment.csv",
           "source_field": "Disabilities"
         },
@@ -33169,10 +33049,6 @@
             "Communication problems, Mobility problems, Other disability (enter below)": 4306934
           }
         },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Disabilities"
-        },
         "observation_concept_id": {
           "source_table": "Appointment.csv",
           "source_field": "Disabilities",
@@ -33201,10 +33077,6 @@
           "source_table": "Appointment.csv",
           "source_field": "DeclarationAcceptedDate"
         },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Disabilities"
-        },
         "observation_source_concept_id": {
           "source_table": "Appointment.csv",
           "source_field": "Disabilities",
@@ -33221,10 +33093,6 @@
         "observation_datetime": {
           "source_table": "Appointment.csv",
           "source_field": "DeclarationAcceptedDate"
-        },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Disabilities"
         },
         "observation_source_value": {
           "source_table": "Appointment.csv",
@@ -33256,10 +33124,6 @@
           "term_mapping": {
             "Communication problems, Hearing impairment, Learning difficulties, Mobility problems": 4306934
           }
-        },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Disabilities"
         },
         "observation_source_value": {
           "source_table": "Appointment.csv",
@@ -33307,10 +33171,6 @@
         "person_id": {
           "source_table": "Appointment.csv",
           "source_field": "PersonId"
-        },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Disabilities"
         }
       },
       "Impaired mobility 4981689": {
@@ -33332,10 +33192,6 @@
             "Hearing impairment, Learning difficulties, Mobility problems": 4306934
           }
         },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Disabilities"
-        },
         "observation_source_value": {
           "source_table": "Appointment.csv",
           "source_field": "Disabilities"
@@ -33349,10 +33205,6 @@
         "observation_datetime": {
           "source_table": "Appointment.csv",
           "source_field": "DeclarationAcceptedDate"
-        },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Disabilities"
         },
         "observation_source_concept_id": {
           "source_table": "Appointment.csv",
@@ -33393,10 +33245,6 @@
           "source_table": "Appointment.csv",
           "source_field": "DeclarationAcceptedDate"
         },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Disabilities"
-        },
         "observation_source_concept_id": {
           "source_table": "Appointment.csv",
           "source_field": "Disabilities",
@@ -33416,10 +33264,6 @@
           "term_mapping": {
             "Communication problems, Learning difficulties, Mobility problems, Visual impairment": 4306934
           }
-        },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Disabilities"
         },
         "person_id": {
           "source_table": "Appointment.csv",
@@ -33467,20 +33311,12 @@
         "observation_source_value": {
           "source_table": "Appointment.csv",
           "source_field": "Disabilities"
-        },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Disabilities"
         }
       },
       "Impaired mobility 4981694": {
         "observation_datetime": {
           "source_table": "Appointment.csv",
           "source_field": "DeclarationAcceptedDate"
-        },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Disabilities"
         },
         "observation_source_value": {
           "source_table": "Appointment.csv",
@@ -33531,10 +33367,6 @@
         "person_id": {
           "source_table": "Appointment.csv",
           "source_field": "PersonId"
-        },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "DementiaHistoryFamily"
         }
       },
       "Tayside health board 4982326": {
@@ -33560,10 +33392,6 @@
           "source_table": "Appointment.csv",
           "source_field": "PersonId"
         },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Region"
-        },
         "observation_source_value": {
           "source_table": "Appointment.csv",
           "source_field": "Region"
@@ -33577,10 +33405,6 @@
         "observation_datetime": {
           "source_table": "Appointment.csv",
           "source_field": "DeclarationAcceptedDate"
-        },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Region"
         },
         "observation_concept_id": {
           "source_table": "Appointment.csv",
@@ -33624,10 +33448,6 @@
           "source_table": "Appointment.csv",
           "source_field": "Region"
         },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Region"
-        },
         "observation_datetime": {
           "source_table": "Appointment.csv",
           "source_field": "DeclarationAcceptedDate"
@@ -33644,10 +33464,6 @@
           "term_mapping": {
             "Fife": 40428679
           }
-        },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Region"
         },
         "observation_concept_id": {
           "source_table": "Appointment.csv",
@@ -33691,10 +33507,6 @@
         "observation_source_value": {
           "source_table": "Appointment.csv",
           "source_field": "Region"
-        },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Region"
         }
       },
       "England 4982331": {
@@ -33723,10 +33535,6 @@
           "term_mapping": {
             "East of England": 35818511
           }
-        },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Region"
         }
       },
       "England 4982332": {
@@ -33741,10 +33549,6 @@
         "observation_datetime": {
           "source_table": "Appointment.csv",
           "source_field": "DeclarationAcceptedDate"
-        },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Region"
         },
         "observation_concept_id": {
           "source_table": "Appointment.csv",
@@ -33781,10 +33585,6 @@
           "source_table": "Appointment.csv",
           "source_field": "PersonId"
         },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Region"
-        },
         "observation_source_concept_id": {
           "source_table": "Appointment.csv",
           "source_field": "Region",
@@ -33797,10 +33597,6 @@
         "observation_datetime": {
           "source_table": "Appointment.csv",
           "source_field": "DeclarationAcceptedDate"
-        },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Region"
         },
         "observation_concept_id": {
           "source_table": "Appointment.csv",
@@ -33848,10 +33644,6 @@
           "source_table": "Appointment.csv",
           "source_field": "PersonId"
         },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Region"
-        },
         "observation_datetime": {
           "source_table": "Appointment.csv",
           "source_field": "DeclarationAcceptedDate"
@@ -33866,10 +33658,6 @@
           }
         },
         "observation_source_value": {
-          "source_table": "Appointment.csv",
-          "source_field": "Region"
-        },
-        "value_as_string": {
           "source_table": "Appointment.csv",
           "source_field": "Region"
         },
@@ -33898,10 +33686,6 @@
           }
         },
         "observation_source_value": {
-          "source_table": "Appointment.csv",
-          "source_field": "Region"
-        },
-        "value_as_string": {
           "source_table": "Appointment.csv",
           "source_field": "Region"
         },
@@ -33947,10 +33731,6 @@
         "person_id": {
           "source_table": "Appointment.csv",
           "source_field": "PersonId"
-        },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Region"
         }
       },
       "England 4982339": {
@@ -33970,10 +33750,6 @@
           "source_field": "PersonId"
         },
         "observation_source_value": {
-          "source_table": "Appointment.csv",
-          "source_field": "Region"
-        },
-        "value_as_string": {
           "source_table": "Appointment.csv",
           "source_field": "Region"
         },
@@ -34011,10 +33787,6 @@
           "term_mapping": {
             "South West Peninsula": 35818511
           }
-        },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Region"
         }
       },
       "England 4982341": {
@@ -34039,10 +33811,6 @@
           "term_mapping": {
             "North London": 35818511
           }
-        },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Region"
         },
         "observation_datetime": {
           "source_table": "Appointment.csv",
@@ -34072,10 +33840,6 @@
             "South London": 35818511
           }
         },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Region"
-        },
         "person_id": {
           "source_table": "Appointment.csv",
           "source_field": "PersonId"
@@ -34101,10 +33865,6 @@
           "source_table": "Appointment.csv",
           "source_field": "PersonId"
         },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Region"
-        },
         "observation_concept_id": {
           "source_table": "Appointment.csv",
           "source_field": "Region",
@@ -34120,10 +33880,6 @@
           "term_mapping": {
             "Northern Ireland": 35821616
           }
-        },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Region"
         },
         "observation_datetime": {
           "source_table": "Appointment.csv",
@@ -34168,20 +33924,12 @@
             "Highlands": 44812651
           }
         },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Region"
-        },
         "observation_datetime": {
           "source_table": "Appointment.csv",
           "source_field": "DeclarationAcceptedDate"
         }
       },
       "Ayrshire and Arran health board 4982346": {
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Region"
-        },
         "observation_datetime": {
           "source_table": "Appointment.csv",
           "source_field": "DeclarationAcceptedDate"
@@ -34225,10 +33973,6 @@
           "source_table": "Appointment.csv",
           "source_field": "DeclarationAcceptedDate"
         },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Region"
-        },
         "observation_source_value": {
           "source_table": "Appointment.csv",
           "source_field": "Region"
@@ -34264,10 +34008,6 @@
           "source_table": "Appointment.csv",
           "source_field": "Region"
         },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Region"
-        },
         "observation_datetime": {
           "source_table": "Appointment.csv",
           "source_field": "DeclarationAcceptedDate"
@@ -34281,10 +34021,6 @@
         "person_id": {
           "source_table": "Appointment.csv",
           "source_field": "PersonId"
-        },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Region"
         },
         "observation_concept_id": {
           "source_table": "Appointment.csv",
@@ -34309,10 +34045,6 @@
         "observation_datetime": {
           "source_table": "Appointment.csv",
           "source_field": "DeclarationAcceptedDate"
-        },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Region"
         },
         "observation_concept_id": {
           "source_table": "Appointment.csv",
@@ -34363,10 +34095,6 @@
         "observation_source_value": {
           "source_table": "Appointment.csv",
           "source_field": "Region"
-        },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Region"
         }
       },
       "Shetland health board 4982352": {
@@ -34395,10 +34123,6 @@
         "observation_datetime": {
           "source_table": "Appointment.csv",
           "source_field": "DeclarationAcceptedDate"
-        },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Region"
         }
       },
       "Orkney health board 4982353": {
@@ -34423,10 +34147,6 @@
         "person_id": {
           "source_table": "Appointment.csv",
           "source_field": "PersonId"
-        },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Region"
         },
         "observation_datetime": {
           "source_table": "Appointment.csv",
@@ -34456,20 +34176,12 @@
           "source_table": "Appointment.csv",
           "source_field": "Region"
         },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Region"
-        },
         "observation_datetime": {
           "source_table": "Appointment.csv",
           "source_field": "DeclarationAcceptedDate"
         }
       },
       "England 4982355": {
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Region"
-        },
         "observation_source_concept_id": {
           "source_table": "Appointment.csv",
           "source_field": "Region",
@@ -34513,10 +34225,6 @@
             "Wessex": 35818511
           }
         },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Region"
-        },
         "observation_datetime": {
           "source_table": "Appointment.csv",
           "source_field": "DeclarationAcceptedDate"
@@ -34545,10 +34253,6 @@
           "source_table": "Appointment.csv",
           "source_field": "Region"
         },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Region"
-        },
         "person_id": {
           "source_table": "Appointment.csv",
           "source_field": "PersonId"
@@ -34570,10 +34274,6 @@
           }
         },
         "observation_source_value": {
-          "source_table": "Appointment.csv",
-          "source_field": "Region"
-        },
-        "value_as_string": {
           "source_table": "Appointment.csv",
           "source_field": "Region"
         },
@@ -34609,10 +34309,6 @@
             "Kent, Surrey and Sussex": 35818511
           }
         },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Region"
-        },
         "observation_concept_id": {
           "source_table": "Appointment.csv",
           "source_field": "Region",
@@ -34636,10 +34332,6 @@
           "term_mapping": {
             "Indian (Asian or Asian British)": 35825508
           }
-        },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "EthnicGroup"
         },
         "observation_datetime": {
           "source_table": "Appointment.csv",
@@ -34665,10 +34357,6 @@
             "Any other Asian background (Asian or Asian British)": 35825508
           }
         },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "EthnicGroup"
-        },
         "person_id": {
           "source_table": "Appointment.csv",
           "source_field": "PersonId"
@@ -34690,10 +34378,6 @@
         }
       },
       "Asian or Asian British 4982362": {
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "EthnicGroup"
-        },
         "observation_datetime": {
           "source_table": "Appointment.csv",
           "source_field": "DeclarationAcceptedDate"
@@ -34737,10 +34421,6 @@
           "source_table": "Appointment.csv",
           "source_field": "DeclarationAcceptedDate"
         },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "EthnicGroup"
-        },
         "observation_source_concept_id": {
           "source_table": "Appointment.csv",
           "source_field": "EthnicGroup",
@@ -34776,20 +34456,12 @@
             "Bangladeshi (Asian or Asian British)": 35825508
           }
         },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "EthnicGroup"
-        },
         "observation_source_value": {
           "source_table": "Appointment.csv",
           "source_field": "EthnicGroup"
         }
       },
       "Asian or Asian British 4982365": {
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "EthnicGroup"
-        },
         "observation_datetime": {
           "source_table": "Appointment.csv",
           "source_field": "DeclarationAcceptedDate"
@@ -34818,10 +34490,6 @@
         }
       },
       "Any other mixed background 4982366": {
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "EthnicGroup"
-        },
         "observation_datetime": {
           "source_table": "Appointment.csv",
           "source_field": "DeclarationAcceptedDate"
@@ -34861,10 +34529,6 @@
           "source_table": "Appointment.csv",
           "source_field": "PersonId"
         },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "EthnicGroup"
-        },
         "observation_source_value": {
           "source_table": "Appointment.csv",
           "source_field": "EthnicGroup"
@@ -34883,10 +34547,6 @@
       },
       "Extracellular dense beta amyloid plaque with dystrophic neurites 4982370": {
         "observation_source_value": {
-          "source_table": "Diagnosis.csv",
-          "source_field": "PositiveAmyloidPlaque"
-        },
-        "value_as_string": {
           "source_table": "Diagnosis.csv",
           "source_field": "PositiveAmyloidPlaque"
         },
@@ -34921,10 +34581,6 @@
             "Learning difficulties, Other disability (enter below)": 440382
           }
         },
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Disabilities"
-        },
         "observation_source_value": {
           "source_table": "Appointment.csv",
           "source_field": "Disabilities"
@@ -34946,10 +34602,6 @@
         }
       },
       "Learning difficulties 4982382": {
-        "value_as_string": {
-          "source_table": "Appointment.csv",
-          "source_field": "Disabilities"
-        },
         "person_id": {
           "source_table": "Appointment.csv",
           "source_field": "PersonId"
@@ -35036,10 +34688,6 @@
         }
       },
       "APOE gene allele 4 | Blood or Tissue | Mutations 4982380": {
-        "value_as_number": {
-          "source_table": "Diagnosis.csv",
-          "source_field": "PositiveApoe4"
-        },
         "measurement_source_value": {
           "source_table": "Diagnosis.csv",
           "source_field": "PositiveApoe4"
