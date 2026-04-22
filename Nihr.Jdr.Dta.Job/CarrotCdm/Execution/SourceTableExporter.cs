@@ -15,7 +15,7 @@ public sealed class SourceTableExporter(
 {
     private readonly CarrotCdmSettings _options = options.Value;
 
-    public async Task ExportAsync(CancellationToken cancellationToken = default)
+    public async Task ExportAsync()
     {
         var export = _options.SourceExport;
 
@@ -27,7 +27,7 @@ public sealed class SourceTableExporter(
         Directory.CreateDirectory(_options.InputDirectory);
 
         await using var connection = new SqlConnection(connectionString);
-        await connection.OpenAsync(cancellationToken);
+        await connection.OpenAsync();
 
         foreach (var table in export.Tables)
         {
@@ -44,16 +44,14 @@ public sealed class SourceTableExporter(
             await ExportTableAsync(
                 connection,
                 table,
-                outputPath,
-                cancellationToken);
+                outputPath);
         }
     }
 
     private static async Task ExportTableAsync(
         SqlConnection connection,
         SourceTableExport table,
-        string outputPath,
-        CancellationToken cancellationToken)
+        string outputPath)
     {
         var sql = table.QueryOverride
             ?? $"SELECT * FROM [{table.Schema}].[{table.Table}]";
@@ -61,10 +59,7 @@ public sealed class SourceTableExporter(
         await using var command = new SqlCommand(sql, connection);
         command.CommandTimeout = 0;
 
-        await using var reader =
-            await command.ExecuteReaderAsync(
-                CommandBehavior.SequentialAccess,
-                cancellationToken);
+        await using var reader = await command.ExecuteReaderAsync(CommandBehavior.SequentialAccess);
 
         await using var writer =
             new StreamWriter(outputPath, false, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
@@ -76,13 +71,13 @@ public sealed class SourceTableExporter(
         }
         await writer.WriteLineAsync();
 
-        while (await reader.ReadAsync(cancellationToken))
+        while (await reader.ReadAsync())
         {
             for (var i = 0; i < reader.FieldCount; i++)
             {
                 if (i > 0) await writer.WriteAsync(',');
 
-                if (reader.IsDBNull(i))
+                if (await reader.IsDBNullAsync(i))
                 {
                     continue;
                 }
