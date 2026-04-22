@@ -1,40 +1,21 @@
 using System.Data;
-using System.Globalization;
 
-namespace Nihr.Jdr.Dta.CarrotCdm.Readers;
+namespace Nihr.Jdr.Dta.Infrastructure.DataReaders;
 
-public sealed class OmopObservationDateFixingReader(IDataReader inner) : IDataReader
+public sealed class NullNormalizingDataReader(IDataReader inner) : IDataReader
 {
-    private readonly Dictionary<int, int> _datePairs = FindDatePairs(inner);
-    
     public object GetValue(int i)
     {
-        var raw = inner.GetValue(i);
+        var value = inner.GetValue(i);
 
-        if (raw is string s && string.IsNullOrWhiteSpace(s))
+        if (value is string s && string.IsNullOrWhiteSpace(s))
         {
-            raw = DBNull.Value;
+            return DBNull.Value;
         }
 
-        if (_datePairs.TryGetValue(i, out var datetimeIdx) && raw == DBNull.Value)
-        {
-            var dtRaw = inner.GetValue(datetimeIdx);
-
-            if (dtRaw is string dtString &&
-                DateTime.TryParse(dtString, CultureInfo.CurrentCulture, out var parsed))
-            {
-                return parsed.Date;
-            }
-
-            if (dtRaw is DateTime dt)
-            {
-                return dt.Date;
-            }
-        }
-
-        return raw;
+        return value;
     }
-    
+
     public int GetValues(object[] values) => inner.GetValues(values);
 
     public bool Read() => inner.Read();
@@ -78,31 +59,4 @@ public sealed class OmopObservationDateFixingReader(IDataReader inner) : IDataRe
 
     public IDataReader GetData(int i) => inner.GetData(i);
     public string GetDataTypeName(int i) => inner.GetDataTypeName(i);
-    
-    private static Dictionary<int, int> FindDatePairs(IDataReader reader)
-    {
-        var nameToIndex = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-
-        for (var i = 0; i < reader.FieldCount; i++)
-        {
-            nameToIndex[reader.GetName(i)] = i;
-        }
-
-        var pairs = new Dictionary<int, int>();
-
-        foreach (var (name, dateIdx) in nameToIndex)
-        {
-            if (!name.EndsWith("_date", StringComparison.OrdinalIgnoreCase))
-                continue;
-
-            var datetimeName = name.Replace("_date", "_datetime");
-
-            if (nameToIndex.TryGetValue(datetimeName, out var datetimeIdx))
-            {
-                pairs[dateIdx] = datetimeIdx;
-            }
-        }
-
-        return pairs;
-    }
 }

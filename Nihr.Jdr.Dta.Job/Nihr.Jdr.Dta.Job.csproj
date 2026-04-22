@@ -9,6 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="CsvHelper" Version="33.1.0" />
       <PackageReference Include="Google.Cloud.SecretManager.V1" Version="2.7.0" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.24">
         <PrivateAssets>all</PrivateAssets>
@@ -21,7 +22,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Nihr.Jdr.Dta.CarrotCdm\Nihr.Jdr.Dta.CarrotCdm.csproj" />
       <ProjectReference Include="..\Nihr.Jdr.Dta.Infrastructure\Nihr.Jdr.Dta.Infrastructure.csproj" />
     </ItemGroup>
 

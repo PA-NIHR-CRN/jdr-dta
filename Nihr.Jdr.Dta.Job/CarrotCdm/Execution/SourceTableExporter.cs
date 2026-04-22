@@ -4,9 +4,9 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Nihr.Jdr.Dta.CarrotCdm.Configuration;
+using Nihr.Jdr.Dta.Job.Configuration;
 
-namespace Nihr.Jdr.Dta.CarrotCdm.Execution;
+namespace Nihr.Jdr.Dta.Job.CarrotCdm.Execution;
 
 public sealed class SourceTableExporter(
     ILogger<SourceTableExporter> logger,

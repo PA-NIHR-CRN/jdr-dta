@@ -6,8 +6,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nihr.Jdr.Dta.Domain", "Nihr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nihr.Jdr.Dta.Infrastructure", "Nihr.Jdr.Dta.Infrastructure\Nihr.Jdr.Dta.Infrastructure.csproj", "{54BAC61A-31EE-4178-B5FF-BC5D9922FA61}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nihr.Jdr.Dta.CarrotCdm", "Nihr.Jdr.Dta.CarrotCdm\Nihr.Jdr.Dta.CarrotCdm.csproj", "{D17551A2-5EB9-44F3-A80B-146A0C8EA45D}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,9 +24,5 @@ Global
 		{54BAC61A-31EE-4178-B5FF-BC5D9922FA61}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{54BAC61A-31EE-4178-B5FF-BC5D9922FA61}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{54BAC61A-31EE-4178-B5FF-BC5D9922FA61}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D17551A2-5EB9-44F3-A80B-146A0C8EA45D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D17551A2-5EB9-44F3-A80B-146A0C8EA45D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D17551A2-5EB9-44F3-A80B-146A0C8EA45D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D17551A2-5EB9-44F3-A80B-146A0C8EA45D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

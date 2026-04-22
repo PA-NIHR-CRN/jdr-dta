@@ -1,4 +1,4 @@
-namespace Nihr.Jdr.Dta.CarrotCdm.Configuration;
+namespace Nihr.Jdr.Dta.Job.Configuration;
 
 public class SourceExportSettings
 {

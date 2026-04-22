@@ -1,12 +1,12 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Nihr.Jdr.Dta.CarrotCdm.Configuration;
-using Nihr.Jdr.Dta.CarrotCdm.Execution;
+using Nihr.Jdr.Dta.Job.CarrotCdm.Execution;
+using Nihr.Jdr.Dta.Job.Configuration;
 
-namespace Nihr.Jdr.Dta.CarrotCdm;
+namespace Nihr.Jdr.Dta.Job.CarrotCdm;
 
-public sealed class CarrotCdmJob(
-    ILogger<CarrotCdmJob> logger,
+public sealed class CarrotCdmOrchestrator(
+    ILogger<CarrotCdmOrchestrator> logger,
     SourceTableExporter exporter,
     CarrotTransformRunner transformRunner,
     OmopSchemaCreator schemaCreator,

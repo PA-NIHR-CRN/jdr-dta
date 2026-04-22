@@ -1,8 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Nihr.Jdr.Dta.CarrotCdm;
-using Nihr.Jdr.Dta.CarrotCdm.Configuration;
+using Nihr.Jdr.Dta.Job.CarrotCdm;
 using Nihr.Jdr.Dta.Job.Startup;
 
 namespace Nihr.Jdr.Dta.Job;
@@ -18,7 +17,6 @@ internal class Program
             builder.AddNihrConfiguration();
             builder.ConfigureNihrLogging();
             builder.ConfigureDependencyInjection();
-            builder.Services.AddCarrotCdm(builder.Configuration);
 
             var host = builder.Build();
 
@@ -28,7 +26,7 @@ internal class Program
 
             using var scope = host.Services.CreateScope();
             var job = scope.ServiceProvider.GetRequiredService<JobRunner>();
-            var carrotRunner = scope.ServiceProvider.GetRequiredService<CarrotCdmJob>();
+            var carrotRunner = scope.ServiceProvider.GetRequiredService<CarrotCdmOrchestrator>();
 
             var loadResult = await job.RunAsync();
 
