@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Nihr.Jdr.Dta.Domain.Interfaces;
@@ -8,7 +7,6 @@ namespace Nihr.Jdr.Dta.Job.CarrotCdm;
 
 public sealed class CarrotCdmTransformJob(
     ILogger<CarrotCdmTransformJob> logger,
-    IConfiguration configuration,
     ISourceTableExportRepository sourceExportRepository,
     IOmopSchemaRepository omopSchemaRepository,
     IOmopBulkLoader omopBulkLoader,

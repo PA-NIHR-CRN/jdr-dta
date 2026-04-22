@@ -15,7 +15,7 @@ public sealed class SqlOmopSchemaRepository(
         ?? throw new InvalidOperationException(
             $"Connection string DefaultConnection not found.");
     
-    public async Task DropSchemaAsync(string schemaName)
+    public async Task DropSchemaAsync(string schema)
     {
         const string dropSql = """
             IF EXISTS (SELECT 1 FROM sys.schemas WHERE name = @SchemaName)
@@ -35,7 +35,7 @@ public sealed class SqlOmopSchemaRepository(
 
         logger.LogWarning(
             "Dropping schema [{Schema}] and all contained tables",
-            schemaName);
+            schema);
 
         await using var connection = new SqlConnection(_connectionString);
         await connection.OpenAsync();
@@ -45,12 +45,12 @@ public sealed class SqlOmopSchemaRepository(
         command.Parameters.Add(new SqlParameter(
             "@SchemaName",
             System.Data.SqlDbType.NVarChar,
-            128) { Value = schemaName });
+            128) { Value = schema });
 
         await command.ExecuteNonQueryAsync();
     }
 
-    public async Task CreateSchemaAsync(string schemaName)
+    public async Task CreateSchemaAsync(string schema)
     {
         const string createSql = """
             IF NOT EXISTS (SELECT 1 FROM sys.schemas WHERE name = @SchemaName)
@@ -67,29 +67,29 @@ public sealed class SqlOmopSchemaRepository(
         command.Parameters.Add(new SqlParameter(
             "@SchemaName",
             System.Data.SqlDbType.NVarChar,
-            128) { Value = schemaName });
+            128) { Value = schema });
 
         await command.ExecuteNonQueryAsync();
     }
 
-    public async Task ExecuteDdlAsync(string ddlScriptPath, string schemaName)
+    public async Task ExecuteDdlAsync(string ddlPath, string schema)
     {
-        if (!File.Exists(ddlScriptPath))
+        if (!File.Exists(ddlPath))
         {
             throw new FileNotFoundException(
                 "OMOP DDL script not found",
-                ddlScriptPath);
+                ddlPath);
         }
 
         logger.LogInformation(
             "Executing OMOP DDL script against schema [{Schema}]",
-            schemaName);
+            schema);
 
-        var ddlSql = await File.ReadAllTextAsync(ddlScriptPath);
+        var ddlSql = await File.ReadAllTextAsync(ddlPath);
 
         ddlSql = ddlSql.Replace(
             "@cdmDatabaseSchema",
-            schemaName,
+            schema,
             StringComparison.OrdinalIgnoreCase);
 
         await using var connection = new SqlConnection(_connectionString);
