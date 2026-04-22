@@ -13,8 +13,6 @@ using Nihr.Jdr.Dta.Infrastructure.Adapters;
 using Nihr.Jdr.Dta.Infrastructure.DAL;
 using Nihr.Jdr.Dta.Infrastructure.Settings;
 using Nihr.Jdr.Dta.Job.CarrotCdm;
-using Nihr.Jdr.Dta.Job.CarrotCdm.Execution;
-using Nihr.Jdr.Dta.Job.Configuration;
 
 namespace Nihr.Jdr.Dta.Job.Startup;
 
@@ -57,11 +55,11 @@ public static class DependencyInjection
         builder.Services.AddScoped<IExternalJdrDbCredentialProvider, ExternalJdrDbCredentialProvider>();
         builder.Services.AddScoped<IExternalJdrDbRepository, ExternalJdrDbRepository>();
         builder.Services.AddScoped<IJdrDtaDbRepository, JdrDtaDbRepository>();
+        builder.Services.AddScoped<IOmopSchemaRepository, SqlOmopSchemaRepository>();
+        builder.Services.AddScoped<IOmopBulkLoader, SqlOmopBulkLoader>();
+        builder.Services.AddScoped<ISourceTableExportRepository, SqlSourceTableExportRepository>();
         builder.Services.AddScoped<JobRunner>();
-        builder.Services.AddSingleton<SourceTableExporter>();
-        builder.Services.AddSingleton<CarrotTransformRunner>();
-        builder.Services.AddSingleton<OmopSchemaCreator>();
-        builder.Services.AddSingleton<OmopBulkLoader>();
-        builder.Services.AddSingleton<CarrotCdmOrchestrator>();
+        builder.Services.AddScoped<CarrotTransformRunner>();
+        builder.Services.AddScoped<CarrotCdmTransformJob>();
     }
 }

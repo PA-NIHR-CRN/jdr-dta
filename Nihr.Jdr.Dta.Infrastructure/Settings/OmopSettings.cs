@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Nihr.Jdr.Dta.Job.Configuration;
+namespace Nihr.Jdr.Dta.Infrastructure.Settings;
 
 public class OmopSettings
 {
@@ -8,6 +8,7 @@ public class OmopSettings
 
     [Required] public string SchemaName { get; set; } = null!;
     [Required] public string ConnectionString { get; set; } = null!;
+    public List<string> SkipImportTableNames { get; init; } = [];
     
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {

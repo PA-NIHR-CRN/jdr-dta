@@ -1,9 +1,9 @@
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Nihr.Jdr.Dta.Job.Configuration;
+using Nihr.Jdr.Dta.Infrastructure.Settings;
 
-namespace Nihr.Jdr.Dta.Job.CarrotCdm.Execution;
+namespace Nihr.Jdr.Dta.Job.CarrotCdm;
 
 public sealed class CarrotTransformRunner(
     ILogger<CarrotTransformRunner> logger,

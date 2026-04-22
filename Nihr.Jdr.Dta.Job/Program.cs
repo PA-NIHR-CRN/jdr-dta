@@ -26,7 +26,7 @@ internal class Program
 
             using var scope = host.Services.CreateScope();
             var job = scope.ServiceProvider.GetRequiredService<JobRunner>();
-            var carrotRunner = scope.ServiceProvider.GetRequiredService<CarrotCdmOrchestrator>();
+            var carrotRunner = scope.ServiceProvider.GetRequiredService<CarrotCdmTransformJob>();
 
             var loadResult = await job.RunAsync();
 
@@ -46,7 +46,7 @@ internal class Program
         }
         catch (Exception e)
         {
-            Console.Error.WriteLine("Critical error during application startup:");
+            await Console.Error.WriteLineAsync("Critical error during application startup:");
             Console.Error.WriteLine(e);
             return 1;
         }

@@ -1,4 +1,4 @@
-namespace Nihr.Jdr.Dta.Job.Configuration;
+namespace Nihr.Jdr.Dta.Domain.Export;
 
 public class SourceTableExport
 {

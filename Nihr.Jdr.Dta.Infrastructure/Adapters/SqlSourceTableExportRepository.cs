@@ -2,59 +2,30 @@ using System.Data;
 using System.Text;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Nihr.Jdr.Dta.Job.Configuration;
+using Nihr.Jdr.Dta.Domain.Export;
+using Nihr.Jdr.Dta.Domain.Interfaces;
+using Nihr.Jdr.Dta.Infrastructure.Settings;
 
-namespace Nihr.Jdr.Dta.Job.CarrotCdm.Execution;
+namespace Nihr.Jdr.Dta.Infrastructure.Adapters;
 
-public sealed class SourceTableExporter(
-    ILogger<SourceTableExporter> logger,
+public sealed class SqlSourceTableExportRepository(
     IConfiguration configuration,
     IOptions<CarrotCdmSettings> options)
+    : ISourceTableExportRepository
 {
-    private readonly CarrotCdmSettings _options = options.Value;
-
-    public async Task ExportAsync()
+    private readonly string _connectionString =
+        configuration.GetConnectionString(
+            options.Value.SourceExport.ConnectionStringName)
+        ?? throw new InvalidOperationException(
+            $"Connection string '{options.Value.SourceExport.ConnectionStringName}' not found.");
+    
+    public async Task ExportAsync(SourceTableExport table, string outputPath)
     {
-        var export = _options.SourceExport;
+        var sql = table.QueryOverride ?? $"SELECT * FROM [{table.Schema}].[{table.Table}]";
 
-        var connectionString =
-            configuration.GetConnectionString(export.ConnectionStringName)
-            ?? throw new InvalidOperationException(
-                $"Connection string '{export.ConnectionStringName}' not found.");
-
-        Directory.CreateDirectory(_options.InputDirectory);
-
-        await using var connection = new SqlConnection(connectionString);
+        await using var connection = new SqlConnection(_connectionString);
         await connection.OpenAsync();
-
-        foreach (var table in export.Tables)
-        {
-            var outputPath = Path.Combine(
-                _options.InputDirectory,
-                table.OutputFile);
-
-            logger.LogInformation(
-                "Exporting {Schema}.{Table} → {Output}",
-                table.Schema,
-                table.Table,
-                outputPath);
-
-            await ExportTableAsync(
-                connection,
-                table,
-                outputPath);
-        }
-    }
-
-    private static async Task ExportTableAsync(
-        SqlConnection connection,
-        SourceTableExport table,
-        string outputPath)
-    {
-        var sql = table.QueryOverride
-            ?? $"SELECT * FROM [{table.Schema}].[{table.Table}]";
 
         await using var command = new SqlCommand(sql, connection);
         command.CommandTimeout = 0;

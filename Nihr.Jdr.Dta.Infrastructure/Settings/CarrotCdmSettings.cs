@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Nihr.Jdr.Dta.Job.Configuration;
+namespace Nihr.Jdr.Dta.Infrastructure.Settings;
 
 public class CarrotCdmSettings
 {
