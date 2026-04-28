@@ -6,10 +6,9 @@ RUN apt-get update \
         python3 \
         python3-venv \
         python3-pip \
+    && python3 -m venv /opt/carrot-venv \
+    && /opt/carrot-venv/bin/pip install --no-cache-dir carrot-transform \
     && rm -rf /var/lib/apt/lists/*
-
-RUN python3 -m venv /opt/carrot-venv \
-    && /opt/carrot-venv/bin/pip install --no-cache-dir carrot-transform 
     
 ENV PATH="/opt/carrot-venv/bin:${PATH}"
 
