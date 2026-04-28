@@ -1,6 +1,9 @@
 name: Deploy Bunny
 
 on:
+  push:
+    branches:
+      - feat/CRNCC-3023-Bunny
   workflow_dispatch:
 
 jobs:
