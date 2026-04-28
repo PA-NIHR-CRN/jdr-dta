@@ -42,8 +42,8 @@ jobs:
           ECR_REPOSITORY: ${{ vars.ACCOUNT_PREFIX }}-ecr-repo-${{ vars.ENVIRONMENT_STAGE }}-jdr-dta
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
-          bunny_source_image="ghcr.io/health-informatics-uon/hutch/bunny:${BUNNY_VERSION}"
-          image_tag="jdr-dta-bunny-${BUNNY_VERSION}"
+          bunny_source_image="ghcr.io/health-informatics-uon/hutch/bunny:${ env.BUNNY_VERSION }"
+          image_tag="jdr-dta-bunny-${ env.BUNNY_VERSION }"
           
           docker pull "$bunny_source_image"
           docker tag "$bunny_source_image" \
