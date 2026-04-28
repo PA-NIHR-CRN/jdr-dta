@@ -38,16 +38,21 @@ jobs:
       - name: Pull Bunny image and push to ECR
         id: image
         env:
-          IMAGE_TAG: jdr-dta-bunny-v1.7.0
+          BUNNY_VERSION: 1.7.0
           ECR_REPOSITORY: ${{ vars.ACCOUNT_PREFIX }}-ecr-repo-${{ vars.ENVIRONMENT_STAGE }}-jdr-dta
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          BUNNY_SOURCE_IMAGE: ghcr.io/health-informatics-uon/hutch/bunny:v1.7.0
         run: |
-          docker pull ${{ env.BUNNY_SOURCE_IMAGE }}
-          docker tag ${{ env.BUNNY_SOURCE_IMAGE }} \
-            $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG 
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG  
-          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> "$GITHUB_OUTPUT"
+          bunny_source_image="ghcr.io/health-informatics-uon/hutch/bunny:${BUNNY_VERSION}"
+          image_tag="jdr-dta-bunny-${BUNNY_VERSION}"
+          
+          docker pull "$bunny_source_image"
+          
+          docker tag "$bunny_source_image" \
+            "$ECR_REGISTRY/$ECR_REPOSITORY:$image_tag"
+          
+          docker push "$ECR_REGISTRY/$ECR_REPOSITORY:$image_tag"
+          
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$image_tag" >> "$GITHUB_OUTPUT"
 
       - name: Get AWS Account ID
         run: |
