@@ -27,8 +27,7 @@ public sealed class SqlOmopBulkLoader(
         using var reader = new StreamReader(tsvPath);
         using var csv = CreateCsvReader(reader);
         using var csvDataReader = new CsvDataReader(csv);
-        using var nullFixer = new NullNormalizingDataReader(csvDataReader);
-        using var dateFixer = new OmopObservationDateFixingReader(nullFixer);
+        using var dateFixer = new OmopDateFixingReader(csvDataReader);
         
         using var bulkCopy = new SqlBulkCopy(
             connection,

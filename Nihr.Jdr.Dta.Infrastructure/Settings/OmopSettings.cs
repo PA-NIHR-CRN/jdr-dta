@@ -4,6 +4,8 @@ namespace Nihr.Jdr.Dta.Infrastructure.Settings;
 
 public class OmopSettings : IValidatableObject
 {
+    public static string SectionName { get; set; } = "Omop";
+
     [Required] public string SchemaName { get; set; } = null!;
     [Required] public string ConnectionString { get; set; } = null!;
     public List<string> SkipImportTableNames { get; init; } = [];

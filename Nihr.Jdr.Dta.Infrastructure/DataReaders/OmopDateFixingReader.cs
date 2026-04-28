@@ -1,21 +1,35 @@
 using System.Data;
+using System.Globalization;
 
 namespace Nihr.Jdr.Dta.Infrastructure.DataReaders;
 
-public sealed class NullNormalizingDataReader(IDataReader inner) : IDataReader
+public sealed class OmopDateFixingReader(IDataReader inner) : IDataReader
 {
+    private readonly Dictionary<int, int> _datePairs = FindDatePairs(inner);
+
     public object GetValue(int i)
     {
-        var value = inner.GetValue(i);
+        var raw = NormalizeNull(inner.GetValue(i));
 
-        if (value is string s && string.IsNullOrWhiteSpace(s))
+        if (_datePairs.TryGetValue(i, out var datetimeIdx) && raw == DBNull.Value)
         {
-            return DBNull.Value;
+            var dtRaw = NormalizeNull(inner.GetValue(datetimeIdx));
+
+            if (dtRaw is string dtString &&
+                DateTime.TryParse(dtString, CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsed))
+            {
+                return parsed.Date;
+            }
+
+            if (dtRaw is DateTime dt)
+            {
+                return dt.Date;
+            }
         }
 
-        return value;
+        return raw;
     }
-
+    
     public int GetValues(object[] values) => inner.GetValues(values);
 
     public bool Read() => inner.Read();
@@ -59,4 +73,43 @@ public sealed class NullNormalizingDataReader(IDataReader inner) : IDataReader
 
     public IDataReader GetData(int i) => inner.GetData(i);
     public string GetDataTypeName(int i) => inner.GetDataTypeName(i);
+
+    private static object NormalizeNull(object value)
+    {
+        if (value is string s && string.IsNullOrWhiteSpace(s))
+        {
+            return DBNull.Value;
+        }
+
+        return value;
+    }
+
+    private static Dictionary<int, int> FindDatePairs(IDataReader reader)
+    {
+        var nameToIndex = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
+        for (var i = 0; i < reader.FieldCount; i++)
+        {
+            nameToIndex[reader.GetName(i)] = i;
+        }
+
+        var pairs = new Dictionary<int, int>();
+
+        foreach (var (name, dateIdx) in nameToIndex)
+        {
+            if (!name.EndsWith("_date", StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            var datetimeName = name.Replace("_date", "_datetime", StringComparison.OrdinalIgnoreCase);
+
+            if (nameToIndex.TryGetValue(datetimeName, out var datetimeIdx))
+            {
+                pairs[dateIdx] = datetimeIdx;
+            }
+        }
+
+        return pairs;
+    }
 }
