@@ -2,10 +2,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Nihr.Jdr.Dta.Infrastructure.Settings;
 
-public class CarrotCdmSettings
+public class CarrotCdmSettings : IValidatableObject
 {
-    public static string SectionName { get; set; } = "CarrotCdm";
-
     [Required] public string InputDirectory { get; set; } = null!;
     [Required] public string RulesFile { get; set; } = null!;
     [Required] public string PersonTable { get; set; } = null!;

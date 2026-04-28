@@ -42,14 +42,9 @@ public static class DependencyInjection
             return new SecretManagerServiceClientBuilder { Credential = googleSdkCredential }.Build();
         });
         
-        builder.Services.AddOptions<OmopSettings>()
-            .Bind(builder.Configuration.GetSection(OmopSettings.SectionName))
-            .ValidateOnStart();
+        builder.Services.GetSectionAndValidate<OmopSettings>(builder.Configuration);
+        builder.Services.GetSectionAndValidate<CarrotCdmSettings>(builder.Configuration);
         
-        builder.Services.AddOptions<CarrotCdmSettings>()
-            .Bind(builder.Configuration.GetSection(CarrotCdmSettings.SectionName))
-            .ValidateOnStart();
-
         builder.Services.AddScoped<ICurrentUserIdProvider<int>, SimpleCurrentUserIdProvider<int>>();
         builder.Services.AddScoped<ICurrentUserIdAccessor<int>, SystemCurrentUserIdAccessor<int>>();
         builder.Services.AddScoped<IExternalJdrDbCredentialProvider, ExternalJdrDbCredentialProvider>();

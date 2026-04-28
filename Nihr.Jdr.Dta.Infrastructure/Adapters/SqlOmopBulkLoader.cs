@@ -2,7 +2,6 @@ using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Nihr.Jdr.Dta.Domain.Interfaces;
@@ -12,24 +11,17 @@ using Nihr.Jdr.Dta.Infrastructure.Settings;
 namespace Nihr.Jdr.Dta.Infrastructure.Adapters;
 
 public sealed class SqlOmopBulkLoader(
-    ILogger<SqlOmopSchemaRepository> logger,
-    IConfiguration configuration,
-    IOptions<CarrotCdmSettings> options)
+    ILogger<SqlOmopBulkLoader> logger,
+    IOptions<OmopSettings> options)
     : IOmopBulkLoader
 {
-    private readonly string _connectionString =
-        configuration.GetConnectionString(
-            options.Value.SourceExport.ConnectionStringName)
-        ?? throw new InvalidOperationException(
-            $"Connection string '{options.Value.SourceExport.ConnectionStringName}' not found.");
-    
     public async Task BulkLoadAsync(string schema, string tableName, string tsvPath)
     {
         logger.LogInformation(
             "Bulk loading [{Schema}].[{Table}] from {File}",
             schema, tableName, tsvPath);
 
-        await using var connection = new SqlConnection(_connectionString);
+        await using var connection = new SqlConnection(options.Value.ConnectionString);
         await connection.OpenAsync();
 
         using var reader = new StreamReader(tsvPath);

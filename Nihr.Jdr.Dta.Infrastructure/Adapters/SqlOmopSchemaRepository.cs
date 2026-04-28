@@ -1,20 +1,16 @@
 using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Nihr.Jdr.Dta.Domain.Interfaces;
+using Nihr.Jdr.Dta.Infrastructure.Settings;
 
 namespace Nihr.Jdr.Dta.Infrastructure.Adapters;
 
 public sealed class SqlOmopSchemaRepository(
     ILogger<SqlOmopSchemaRepository> logger,
-    IConfiguration configuration)
+    IOptions<OmopSettings> options)
     : IOmopSchemaRepository
 {
-    private readonly string _connectionString =
-        configuration.GetConnectionString("DefaultConnection")
-        ?? throw new InvalidOperationException(
-            $"Connection string DefaultConnection not found.");
-    
     public async Task DropSchemaAsync(string schema)
     {
         const string dropSql = """
@@ -37,7 +33,7 @@ public sealed class SqlOmopSchemaRepository(
             "Dropping schema [{Schema}] and all contained tables",
             schema);
 
-        await using var connection = new SqlConnection(_connectionString);
+        await using var connection = new SqlConnection(options.Value.ConnectionString);
         await connection.OpenAsync();
 
         await using var command = connection.CreateCommand();
@@ -59,7 +55,7 @@ public sealed class SqlOmopSchemaRepository(
             END
             """;
 
-        await using var connection = new SqlConnection(_connectionString);
+        await using var connection = new SqlConnection(options.Value.ConnectionString);
         await connection.OpenAsync();
 
         await using var command = connection.CreateCommand();
@@ -92,7 +88,7 @@ public sealed class SqlOmopSchemaRepository(
             schema,
             StringComparison.OrdinalIgnoreCase);
 
-        await using var connection = new SqlConnection(_connectionString);
+        await using var connection = new SqlConnection(options.Value.ConnectionString);
         await connection.OpenAsync();
 
         await using var command = connection.CreateCommand();

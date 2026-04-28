@@ -21,7 +21,7 @@ public sealed class OmopObservationDateFixingReader(IDataReader inner) : IDataRe
             var dtRaw = inner.GetValue(datetimeIdx);
 
             if (dtRaw is string dtString &&
-                DateTime.TryParse(dtString, CultureInfo.CurrentCulture, out var parsed))
+                DateTime.TryParse(dtString, CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsed))
             {
                 return parsed.Date;
             }

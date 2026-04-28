@@ -10,6 +10,7 @@ public sealed class CarrotTransformRunner(
     IOptions<CarrotCdmSettings> carrotCdmSettings)
 {
     private readonly CarrotCdmSettings _settings = carrotCdmSettings.Value;
+    private const string PythonPath = "/opt/carrot-venv/bin/python";
 
     public async Task<int> RunAsync()
     {
@@ -59,7 +60,7 @@ public sealed class CarrotTransformRunner(
     {
         return new ProcessStartInfo
         {
-            FileName = "python",
+            FileName = PythonPath,
             Arguments = BuildArguments(),
             RedirectStandardOutput = true,
             RedirectStandardError = true,
