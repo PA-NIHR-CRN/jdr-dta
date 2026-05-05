@@ -1,0 +1,22 @@
+name: Deploy Bunny
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy-uat:
+    uses: ./.github/workflows/deploy-bunny-template.yml
+    with:
+      environment: UAT
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.CRNCC_STAGING_IAM_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.CRNCC_STAGING_IAM_ACCESS_KEY_SECRET }}
+
+  deploy-prod:
+    needs: deploy-uat
+    uses: ./.github/workflows/deploy-bunny-template.yml
+    with:
+      environment: PROD
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.CRNCC_PROD_IAM_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.CRNCC_PROD_IAM_ACCESS_KEY_SECRET }}

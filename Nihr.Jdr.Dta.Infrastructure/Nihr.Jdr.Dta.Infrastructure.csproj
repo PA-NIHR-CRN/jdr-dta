@@ -16,7 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include=".aws\ecs-task-definition-uat.json" />
+      <Content Include=".aws\bunny-ecs-task-definition.json" />
     </ItemGroup>
 
     <ItemGroup>

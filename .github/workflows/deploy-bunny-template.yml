@@ -1,0 +1,87 @@
+name: Deploy Bunny Template
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+    secrets:
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+
+jobs:
+  deploy:
+    name: "Deploy ${{ inputs.environment }}"
+    runs-on: ubuntu-24.04
+    environment: ${{ inputs.environment }}
+    
+    env:
+      ECS_TASK_DEFINITION: ${{ github.workspace }}/Nihr.Jdr.Dta.Infrastructure/.aws/bunny-ecs-task-definition.json
+
+    steps:
+      - uses: actions/checkout@v6.0.2
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6.0.0
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2.1.2
+
+      - name: Pull Bunny image and push to ECR
+        id: image
+        env:
+          BUNNY_VERSION: 1.7.0
+          ECR_REPOSITORY: ${{ vars.ACCOUNT_PREFIX }}-ecr-repo-${{ vars.ENVIRONMENT_STAGE }}-jdr-dta
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          bunny_source_image="ghcr.io/health-informatics-uon/hutch/bunny:${BUNNY_VERSION}"
+          image_tag="jdr-dta-bunny-${BUNNY_VERSION}"
+          
+          docker pull "$bunny_source_image"
+          
+          docker tag "$bunny_source_image" \
+            "$ECR_REGISTRY/$ECR_REPOSITORY:$image_tag"
+          
+          docker push "$ECR_REGISTRY/$ECR_REPOSITORY:$image_tag"
+          
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$image_tag" >> "$GITHUB_OUTPUT"
+
+      - name: Get AWS Account ID
+        run: |
+          account=$(aws sts get-caller-identity --query 'Account' --output text)
+          echo "::add-mask::$account"
+          echo "ACCOUNT_ID=$account" >> $GITHUB_ENV
+
+      - name: Replace placeholders in task definition
+        run: |
+          sed -i "s/__ACCOUNT_ID__/${ACCOUNT_ID}/g" ${{ env.ECS_TASK_DEFINITION }}
+          sed -i "s/__ENVIRONMENT__/${{ vars.ENVIRONMENT_STAGE }}/g" ${{ env.ECS_TASK_DEFINITION }}
+          sed -i "s/__ACCOUNT_PREFIX__/${{ vars.ACCOUNT_PREFIX }}/g" ${{ env.ECS_TASK_DEFINITION }}
+          sed -i "s/__AWS_REGION__/${{ vars.AWS_REGION }}/g" ${{ env.ECS_TASK_DEFINITION }}
+          sed -i "s/__SECRET_MANAGER_ARN_SUFFIX__/${{ vars.SECRET_MANAGER_ARN_SUFFIX }}/g" ${{ env.ECS_TASK_DEFINITION }}
+
+      - name: Fill in the new image ID
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1.8.3
+        env:
+          CONTAINER_NAME: ${{ vars.ACCOUNT_PREFIX }}-ecs-${{ vars.ENVIRONMENT_STAGE }}-jdr-dta-bunny-container
+        with:
+          task-definition: ${{ env.ECS_TASK_DEFINITION }}
+          container-name: ${{ env.CONTAINER_NAME }}
+          image: ${{ steps.image.outputs.image }}
+
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2.6.0
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ vars.ACCOUNT_PREFIX }}-ecs-service-${{ vars.ENVIRONMENT_STAGE }}-jdr-dta-bunny
+          cluster: ${{ vars.ACCOUNT_PREFIX }}-ecs-cluster-${{ vars.ENVIRONMENT_STAGE }}-jdr-dta
+          wait-for-service-stability: true
