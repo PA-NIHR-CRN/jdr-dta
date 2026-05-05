@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Nihr.Jdr.Dta.Job.CarrotCdm;
 using Nihr.Jdr.Dta.Job.Startup;
 
 namespace Nihr.Jdr.Dta.Job;
@@ -25,15 +26,27 @@ internal class Program
 
             using var scope = host.Services.CreateScope();
             var job = scope.ServiceProvider.GetRequiredService<JobRunner>();
+            var carrotRunner = scope.ServiceProvider.GetRequiredService<CarrotCdmTransformJob>();
 
-            var result = await job.RunAsync();
+            var loadResult = await job.RunAsync();
 
-            logger.LogInformation("Job execution finished with result: {Result}", result);
-            return result;
+            logger.LogInformation("Job execution finished with result: {Result}", loadResult);
+
+            if (loadResult != 0)
+            {
+                logger.LogWarning("Skipping CarrotCDM run because job failed");
+                return loadResult;
+            }
+            
+            var carrotResult = await carrotRunner.RunAsync();
+
+            logger.LogInformation("CarrotCDM finished with result: {Result}", carrotResult);
+
+            return carrotResult;
         }
         catch (Exception e)
         {
-            Console.Error.WriteLine("Critical error during application startup:");
+            await Console.Error.WriteLineAsync("Critical error during application startup:");
             Console.Error.WriteLine(e);
             return 1;
         }

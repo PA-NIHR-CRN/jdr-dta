@@ -1,4 +1,21 @@
 ﻿FROM mcr.microsoft.com/dotnet/runtime:10.0 AS base
+
+USER root
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        python3 \
+        python3-venv \
+        python3-pip \
+    && python3 -m venv /opt/carrot-venv \
+    && /opt/carrot-venv/bin/pip install --no-cache-dir carrot-transform \
+    && rm -rf /var/lib/apt/lists/*
+    
+ENV PATH="/opt/carrot-venv/bin:${PATH}"
+
+WORKDIR /src
+COPY CarrotCDM/ /app/CarrotCdm
+RUN chown -R $APP_UID:$APP_UID /app
+
 USER $APP_UID
 WORKDIR /app
 

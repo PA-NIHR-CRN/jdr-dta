@@ -12,6 +12,7 @@ using Nihr.Jdr.Dta.Domain.Interfaces;
 using Nihr.Jdr.Dta.Infrastructure.Adapters;
 using Nihr.Jdr.Dta.Infrastructure.DAL;
 using Nihr.Jdr.Dta.Infrastructure.Settings;
+using Nihr.Jdr.Dta.Job.CarrotCdm;
 
 namespace Nihr.Jdr.Dta.Job.Startup;
 
@@ -40,12 +41,20 @@ public static class DependencyInjection
 
             return new SecretManagerServiceClientBuilder { Credential = googleSdkCredential }.Build();
         });
-
+        
+        builder.Services.GetSectionAndValidate<OmopSettings>(builder.Configuration);
+        builder.Services.GetSectionAndValidate<CarrotCdmSettings>(builder.Configuration);
+        
         builder.Services.AddScoped<ICurrentUserIdProvider<int>, SimpleCurrentUserIdProvider<int>>();
         builder.Services.AddScoped<ICurrentUserIdAccessor<int>, SystemCurrentUserIdAccessor<int>>();
         builder.Services.AddScoped<IExternalJdrDbCredentialProvider, ExternalJdrDbCredentialProvider>();
         builder.Services.AddScoped<IExternalJdrDbRepository, ExternalJdrDbRepository>();
         builder.Services.AddScoped<IJdrDtaDbRepository, JdrDtaDbRepository>();
+        builder.Services.AddScoped<IOmopSchemaRepository, SqlOmopSchemaRepository>();
+        builder.Services.AddScoped<IOmopBulkLoader, SqlOmopBulkLoader>();
+        builder.Services.AddScoped<ISourceTableExportRepository, SqlSourceTableExportRepository>();
         builder.Services.AddScoped<JobRunner>();
+        builder.Services.AddScoped<CarrotTransformRunner>();
+        builder.Services.AddScoped<CarrotCdmTransformJob>();
     }
 }
