@@ -17,9 +17,11 @@ jobs:
     name: "Deploy ${{ inputs.environment }}"
     runs-on: ubuntu-24.04
     environment: ${{ inputs.environment }}
-    
+
     env:
-      ECS_TASK_DEFINITION: ${{ github.workspace }}/Nihr.Jdr.Dta.Infrastructure/.aws/bunny-ecs-task-definition.json
+      ECS_TASK_DEFINITION_TEMPLATE: ${{ github.workspace }}/Nihr.Jdr.Dta.Infrastructure/.aws/bunny-ecs-task-definition.json
+      ECS_TASK_DEFINITION_A: ${{ github.workspace }}/bunny-a-task-definition.json
+      ECS_TASK_DEFINITION_B: ${{ github.workspace }}/bunny-b-task-definition.json
 
     steps:
       - uses: actions/checkout@v6.0.2
@@ -42,46 +44,93 @@ jobs:
           ECR_REPOSITORY: ${{ vars.ACCOUNT_PREFIX }}-ecr-repo-${{ vars.ENVIRONMENT_STAGE }}-jdr-dta
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
+          set -euo pipefail
+
           bunny_source_image="ghcr.io/health-informatics-uon/hutch/bunny:${BUNNY_VERSION}"
           image_tag="jdr-dta-bunny-${BUNNY_VERSION}"
-          
+
           docker pull "$bunny_source_image"
-          
+
           docker tag "$bunny_source_image" \
             "$ECR_REGISTRY/$ECR_REPOSITORY:$image_tag"
-          
+
           docker push "$ECR_REGISTRY/$ECR_REPOSITORY:$image_tag"
-          
+
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$image_tag" >> "$GITHUB_OUTPUT"
 
       - name: Get AWS Account ID
         run: |
+          set -euo pipefail
+
           account=$(aws sts get-caller-identity --query 'Account' --output text)
           echo "::add-mask::$account"
-          echo "ACCOUNT_ID=$account" >> $GITHUB_ENV
+          echo "ACCOUNT_ID=$account" >> "$GITHUB_ENV"
 
-      - name: Replace placeholders in task definition
+      - name: Create Bunny A and Bunny B task definition files
         run: |
-          sed -i "s/__ACCOUNT_ID__/${ACCOUNT_ID}/g" ${{ env.ECS_TASK_DEFINITION }}
-          sed -i "s/__ENVIRONMENT__/${{ vars.ENVIRONMENT_STAGE }}/g" ${{ env.ECS_TASK_DEFINITION }}
-          sed -i "s/__ACCOUNT_PREFIX__/${{ vars.ACCOUNT_PREFIX }}/g" ${{ env.ECS_TASK_DEFINITION }}
-          sed -i "s/__AWS_REGION__/${{ vars.AWS_REGION }}/g" ${{ env.ECS_TASK_DEFINITION }}
-          sed -i "s/__SECRET_MANAGER_ARN_SUFFIX__/${{ vars.SECRET_MANAGER_ARN_SUFFIX }}/g" ${{ env.ECS_TASK_DEFINITION }}
+          set -euo pipefail
 
-      - name: Fill in the new image ID
-        id: task-def
+          cp "${{ env.ECS_TASK_DEFINITION_TEMPLATE }}" "${{ env.ECS_TASK_DEFINITION_A }}"
+          cp "${{ env.ECS_TASK_DEFINITION_TEMPLATE }}" "${{ env.ECS_TASK_DEFINITION_B }}"
+
+      - name: Replace shared placeholders in Bunny A and Bunny B task definitions
+        run: |
+          set -euo pipefail
+
+          for file in "${{ env.ECS_TASK_DEFINITION_A }}" "${{ env.ECS_TASK_DEFINITION_B }}"; do
+            sed -i "s/__ACCOUNT_ID__/${ACCOUNT_ID}/g" "$file"
+            sed -i "s/__ENVIRONMENT__/${{ vars.ENVIRONMENT_STAGE }}/g" "$file"
+            sed -i "s/__ACCOUNT_PREFIX__/${{ vars.ACCOUNT_PREFIX }}/g" "$file"
+            sed -i "s/__AWS_REGION__/${{ vars.AWS_REGION }}/g" "$file"
+            sed -i "s/__SECRET_MANAGER_ARN_SUFFIX__/${{ vars.SECRET_MANAGER_ARN_SUFFIX }}/g" "$file"
+          done
+
+      - name: Replace Bunny A specific placeholders
+        run: |
+          set -euo pipefail
+
+          sed -i "s/__TASK_API_TYPE__/a/g" "${{ env.ECS_TASK_DEFINITION_A }}"
+          sed -i "s/__CONTAINER_SUFFIX__//g" "${{ env.ECS_TASK_DEFINITION_A }}"
+          sed -i "s/__TASK_DEFINITION_SUFFIX__//g" "${{ env.ECS_TASK_DEFINITION_A }}"
+          sed -i "s/__LOG_SUFFIX__//g" "${{ env.ECS_TASK_DEFINITION_A }}"
+
+      - name: Replace Bunny B specific placeholders
+        run: |
+          set -euo pipefail
+
+          sed -i "s/__TASK_API_TYPE__/b/g" "${{ env.ECS_TASK_DEFINITION_B }}"
+          sed -i "s/__CONTAINER_SUFFIX__/-b/g" "${{ env.ECS_TASK_DEFINITION_B }}"
+          sed -i "s/__TASK_DEFINITION_SUFFIX__/-b/g" "${{ env.ECS_TASK_DEFINITION_B }}"
+          sed -i "s/__LOG_SUFFIX__/-b/g" "${{ env.ECS_TASK_DEFINITION_B }}"
+
+      - name: Fill in Bunny A image ID
+        id: task-def-a
         uses: aws-actions/amazon-ecs-render-task-definition@v1.8.3
-        env:
-          CONTAINER_NAME: ${{ vars.ACCOUNT_PREFIX }}-ecs-${{ vars.ENVIRONMENT_STAGE }}-jdr-dta-bunny-container
         with:
-          task-definition: ${{ env.ECS_TASK_DEFINITION }}
-          container-name: ${{ env.CONTAINER_NAME }}
+          task-definition: ${{ env.ECS_TASK_DEFINITION_A }}
+          container-name: ${{ vars.ACCOUNT_PREFIX }}-ecs-${{ vars.ENVIRONMENT_STAGE }}-jdr-dta-bunny-container
           image: ${{ steps.image.outputs.image }}
 
-      - name: Deploy Amazon ECS task definition
+      - name: Deploy Bunny A
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2.6.0
         with:
-          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          task-definition: ${{ steps.task-def-a.outputs.task-definition }}
           service: ${{ vars.ACCOUNT_PREFIX }}-ecs-service-${{ vars.ENVIRONMENT_STAGE }}-jdr-dta-bunny
+          cluster: ${{ vars.ACCOUNT_PREFIX }}-ecs-cluster-${{ vars.ENVIRONMENT_STAGE }}-jdr-dta
+          wait-for-service-stability: true
+
+      - name: Fill in Bunny B image ID
+        id: task-def-b
+        uses: aws-actions/amazon-ecs-render-task-definition@v1.8.3
+        with:
+          task-definition: ${{ env.ECS_TASK_DEFINITION_B }}
+          container-name: ${{ vars.ACCOUNT_PREFIX }}-ecs-${{ vars.ENVIRONMENT_STAGE }}-jdr-dta-bunny-b-container
+          image: ${{ steps.image.outputs.image }}
+
+      - name: Deploy Bunny B
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2.6.0
+        with:
+          task-definition: ${{ steps.task-def-b.outputs.task-definition }}
+          service: ${{ vars.ACCOUNT_PREFIX }}-ecs-service-${{ vars.ENVIRONMENT_STAGE }}-jdr-dta-bunny-b
           cluster: ${{ vars.ACCOUNT_PREFIX }}-ecs-cluster-${{ vars.ENVIRONMENT_STAGE }}-jdr-dta
           wait-for-service-stability: true
