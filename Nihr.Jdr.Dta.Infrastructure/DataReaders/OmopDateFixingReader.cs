@@ -3,20 +3,37 @@ using System.Globalization;
 
 namespace Nihr.Jdr.Dta.Infrastructure.DataReaders;
 
-public sealed class OmopDateFixingReader(IDataReader inner) : IDataReader
+public sealed class OmopDateFixingReader : IDataReader
 {
-    private readonly Dictionary<int, int> _datePairs = FindDatePairs(inner);
+    private readonly IDataReader _inner;
+    private readonly Dictionary<int, int> _datePairs;
+    private readonly HashSet<int> _dateColumnIndices;
+
+    public OmopDateFixingReader(IDataReader inner)
+    {
+        this._inner = inner;
+        (_datePairs, _dateColumnIndices) = AnalyzeColumns(inner);
+    }
 
     public object GetValue(int i)
     {
-        var raw = NormalizeNull(inner.GetValue(i));
+        var raw = NormalizeNull(_inner.GetValue(i));
 
+        // 1. Only attempt parsing if this column is known to be a date or datetime field
+        if (_dateColumnIndices.Contains(i) && raw is string s)
+        {
+            if (TryParseOmopDate(s, out var parsed))
+            {
+                return parsed;
+            }
+        }
+
+        // 2. Fallback logic: If a *_date field is null, try to derive it from the *_datetime field
         if (_datePairs.TryGetValue(i, out var datetimeIdx) && raw == DBNull.Value)
         {
-            var dtRaw = NormalizeNull(inner.GetValue(datetimeIdx));
+            var dtRaw = NormalizeNull(_inner.GetValue(datetimeIdx));
 
-            if (dtRaw is string dtString &&
-                DateTime.TryParse(dtString, CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsed))
+            if (dtRaw is string dtString && TryParseOmopDate(dtString, out var parsed))
             {
                 return parsed.Date;
             }
@@ -29,28 +46,28 @@ public sealed class OmopDateFixingReader(IDataReader inner) : IDataReader
 
         return raw;
     }
-    
-    public int GetValues(object[] values) => inner.GetValues(values);
 
-    public bool Read() => inner.Read();
-    public int FieldCount => inner.FieldCount;
+    public int GetValues(object[] values) => _inner.GetValues(values);
+
+    public bool Read() => _inner.Read();
+    public int FieldCount => _inner.FieldCount;
 
     public object this[int i] => GetValue(i);
     public object this[string name] => GetValue(GetOrdinal(name));
 
     public bool IsDBNull(int i) => GetValue(i) == DBNull.Value;
 
-    public string GetName(int i) => inner.GetName(i);
-    public int GetOrdinal(string name) => inner.GetOrdinal(name);
-    public Type GetFieldType(int i) => inner.GetFieldType(i);
+    public string GetName(int i) => _inner.GetName(i);
+    public int GetOrdinal(string name) => _inner.GetOrdinal(name);
+    public Type GetFieldType(int i) => _inner.GetFieldType(i);
 
-    public void Close() => inner.Close();
-    public DataTable? GetSchemaTable() => inner.GetSchemaTable();
-    public bool NextResult() => inner.NextResult();
-    public int Depth => inner.Depth;
-    public bool IsClosed => inner.IsClosed;
-    public int RecordsAffected => inner.RecordsAffected;
-    public void Dispose() => inner.Dispose();
+    public void Close() => _inner.Close();
+    public DataTable? GetSchemaTable() => _inner.GetSchemaTable();
+    public bool NextResult() => _inner.NextResult();
+    public int Depth => _inner.Depth;
+    public bool IsClosed => _inner.IsClosed;
+    public int RecordsAffected => _inner.RecordsAffected;
+    public void Dispose() => _inner.Dispose();
 
     public bool GetBoolean(int i) => (bool)GetValue(i);
     public byte GetByte(int i) => (byte)GetValue(i);
@@ -66,13 +83,13 @@ public sealed class OmopDateFixingReader(IDataReader inner) : IDataReader
     public string GetString(int i) => (string)GetValue(i);
 
     public long GetBytes(int i, long fieldOffset, byte[]? buffer, int bufferoffset, int length)
-        => inner.GetBytes(i, fieldOffset, buffer, bufferoffset, length);
+        => _inner.GetBytes(i, fieldOffset, buffer, bufferoffset, length);
 
     public long GetChars(int i, long fieldoffset, char[]? buffer, int bufferoffset, int length)
-        => inner.GetChars(i, fieldoffset, buffer, bufferoffset, length);
+        => _inner.GetChars(i, fieldoffset, buffer, bufferoffset, length);
 
-    public IDataReader GetData(int i) => inner.GetData(i);
-    public string GetDataTypeName(int i) => inner.GetDataTypeName(i);
+    public IDataReader GetData(int i) => _inner.GetData(i);
+    public string GetDataTypeName(int i) => _inner.GetDataTypeName(i);
 
     private static object NormalizeNull(object value)
     {
@@ -111,5 +128,54 @@ public sealed class OmopDateFixingReader(IDataReader inner) : IDataReader
         }
 
         return pairs;
+    }
+
+    private static (Dictionary<int, int> Pairs, HashSet<int> DateIndices) AnalyzeColumns(IDataReader reader)
+    {
+        var nameToIndex = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        var dateIndices = new HashSet<int>();
+        var pairs = new Dictionary<int, int>();
+
+        for (var i = 0; i < reader.FieldCount; i++)
+        {
+            var name = reader.GetName(i);
+            nameToIndex[name] = i;
+
+            if (name.EndsWith("_date", StringComparison.OrdinalIgnoreCase) || 
+                name.EndsWith("_datetime", StringComparison.OrdinalIgnoreCase))
+            {
+                dateIndices.Add(i);
+            }
+        }
+
+        foreach (var (name, dateIdx) in nameToIndex)
+        {
+            if (!name.EndsWith("_date", StringComparison.OrdinalIgnoreCase)) continue;
+
+            var datetimeName = name.Replace("_date", "_datetime", StringComparison.OrdinalIgnoreCase);
+            if (nameToIndex.TryGetValue(datetimeName, out var datetimeIdx))
+            {
+                pairs[dateIdx] = datetimeIdx;
+            }
+        }
+
+        return (pairs, dateIndices);
+    }
+    
+    private static bool TryParseOmopDate(string value, out DateTime result)
+    {
+        // Try standard parsing first
+        if (DateTime.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.None, out result))
+        {
+            return true;
+        }
+
+        // Try the specific yyyyMMdd format used in some vocabulary files
+        return DateTime.TryParseExact(
+            value,
+            "yyyyMMdd",
+            CultureInfo.InvariantCulture,
+            DateTimeStyles.None,
+            out result);
     }
 }

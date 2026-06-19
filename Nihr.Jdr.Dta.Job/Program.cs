@@ -3,6 +3,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Nihr.Jdr.Dta.Job.CarrotCdm;
 using Nihr.Jdr.Dta.Job.Startup;
+using Nihr.Jdr.Dta.Job.Utility;
 
 namespace Nihr.Jdr.Dta.Job;
 
@@ -19,30 +20,26 @@ internal class Program
             builder.ConfigureDependencyInjection();
 
             var host = builder.Build();
-
             var logger = host.Services.GetRequiredService<ILogger<Program>>();
 
-            logger.LogInformation("Application host built. Starting job execution");
-
-            using var scope = host.Services.CreateScope();
-            var job = scope.ServiceProvider.GetRequiredService<JobRunner>();
-            var carrotRunner = scope.ServiceProvider.GetRequiredService<CarrotCdmTransformJob>();
-
-            var loadResult = await job.RunAsync();
-
-            logger.LogInformation("Job execution finished with result: {Result}", loadResult);
-
-            if (loadResult != 0)
+            // Argument Parsing
+            if (args.Length > 0)
             {
-                logger.LogWarning("Skipping CarrotCDM run because job failed");
-                return loadResult;
+                using var scope = host.Services.CreateScope();
+                var utilityRunner = scope.ServiceProvider.GetRequiredService<UtilityJobRunner>();
+
+                var command = args[0].ToLowerInvariant();
+                return command switch
+                {
+                    "--deploy-ddl" => await utilityRunner.DeployDdlAsync(),
+                    "--load-ref-data" => await utilityRunner.LoadReferenceDataAsync(args.Skip(1).ToArray()),
+                    _ => RunInvalidCommand(logger, command)
+                };
             }
-            
-            var carrotResult = await carrotRunner.RunAsync();
 
-            logger.LogInformation("CarrotCDM finished with result: {Result}", carrotResult);
-
-            return carrotResult;
+            // Default behavior (Standard ECS Job)
+            logger.LogInformation("No arguments provided. Starting standard job execution.");
+            return await RunStandardJobAsync(host, logger);
         }
         catch (Exception e)
         {
@@ -50,5 +47,27 @@ internal class Program
             Console.Error.WriteLine(e);
             return 1;
         }
+    }
+
+    private static async Task<int> RunStandardJobAsync(IHost host, ILogger logger)
+    {
+        using var scope = host.Services.CreateScope();
+        var job = scope.ServiceProvider.GetRequiredService<JobRunner>();
+        var carrotRunner = scope.ServiceProvider.GetRequiredService<CarrotCdmTransformJob>();
+
+        var loadResult = await job.RunAsync();
+        if (loadResult != 0)
+        {
+            logger.LogWarning("Skipping CarrotCDM run because job failed");
+            return loadResult;
+        }
+
+        return await carrotRunner.RunAsync();
+    }
+
+    private static int RunInvalidCommand(ILogger logger, string command)
+    {
+        logger.LogError("Unknown command: {Command}. Available: --deploy-ddl, --load-ref-data", command);
+        return 1;
     }
 }

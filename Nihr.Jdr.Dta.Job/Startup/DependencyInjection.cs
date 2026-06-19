@@ -1,3 +1,4 @@
+using Amazon.S3;
 using Google.Apis.Auth.OAuth2;
 using Google.Cloud.SecretManager.V1;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +14,7 @@ using Nihr.Jdr.Dta.Infrastructure.Adapters;
 using Nihr.Jdr.Dta.Infrastructure.DAL;
 using Nihr.Jdr.Dta.Infrastructure.Settings;
 using Nihr.Jdr.Dta.Job.CarrotCdm;
+using Nihr.Jdr.Dta.Job.Utility;
 
 namespace Nihr.Jdr.Dta.Job.Startup;
 
@@ -56,5 +58,8 @@ public static class DependencyInjection
         builder.Services.AddScoped<JobRunner>();
         builder.Services.AddScoped<CarrotTransformRunner>();
         builder.Services.AddScoped<CarrotCdmTransformJob>();
+        builder.Services.AddAWSService<IAmazonS3>();
+        builder.Services.AddScoped<IS3Service, S3Service>();
+        builder.Services.AddScoped<UtilityJobRunner>();
     }
 }
