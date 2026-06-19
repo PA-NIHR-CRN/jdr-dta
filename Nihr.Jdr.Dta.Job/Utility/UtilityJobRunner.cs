@@ -55,13 +55,32 @@ public class UtilityJobRunner(
                 // Download from S3 using the new service
                 await s3Service.DownloadFileAsync(s3Url, localPath);
 
-                if (File.Exists(localPath))
+                if (!File.Exists(localPath))
                 {
-                    await omopBulkLoader. BulkLoadFromFileAsync(schema, tableName, localPath, "\t");
-                    logger.LogInformation("Successfully loaded {Table}", tableName);
-                    
-                    // Optional: Clean up temp file
-                    File.Delete(localPath);
+                    logger.LogError("Downloaded file not found at {LocalPath} for {S3Url}", localPath, s3Url);
+                    return 1;
+                }
+
+                await omopBulkLoader.BulkLoadFromFileAsync(schema, tableName, localPath, "\t");
+                logger.LogInformation("Successfully loaded {Table}", tableName);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Failed to load {Table} from {S3Url}", tableName, s3Url);
+                return 1;
+            }
+            finally
+            {
+                try
+                {
+                    if (File.Exists(localPath))
+                    {
+                        File.Delete(localPath);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    logger.LogWarning(ex, "Failed to delete temp file {LocalPath}", localPath);
                 }
             }
             catch (Exception ex)
