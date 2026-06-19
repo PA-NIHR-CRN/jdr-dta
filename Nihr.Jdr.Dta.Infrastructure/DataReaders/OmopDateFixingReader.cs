@@ -101,35 +101,6 @@ public sealed class OmopDateFixingReader : IDataReader
         return value;
     }
 
-    private static Dictionary<int, int> FindDatePairs(IDataReader reader)
-    {
-        var nameToIndex = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-
-        for (var i = 0; i < reader.FieldCount; i++)
-        {
-            nameToIndex[reader.GetName(i)] = i;
-        }
-
-        var pairs = new Dictionary<int, int>();
-
-        foreach (var (name, dateIdx) in nameToIndex)
-        {
-            if (!name.EndsWith("_date", StringComparison.OrdinalIgnoreCase))
-            {
-                continue;
-            }
-
-            var datetimeName = name.Replace("_date", "_datetime", StringComparison.OrdinalIgnoreCase);
-
-            if (nameToIndex.TryGetValue(datetimeName, out var datetimeIdx))
-            {
-                pairs[dateIdx] = datetimeIdx;
-            }
-        }
-
-        return pairs;
-    }
-
     private static (Dictionary<int, int> Pairs, HashSet<int> DateIndices) AnalyzeColumns(IDataReader reader)
     {
         var nameToIndex = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
