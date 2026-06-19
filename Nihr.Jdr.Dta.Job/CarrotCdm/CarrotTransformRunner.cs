@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Nihr.Jdr.Dta.Infrastructure.Settings;
@@ -7,10 +8,11 @@ namespace Nihr.Jdr.Dta.Job.CarrotCdm;
 
 public sealed class CarrotTransformRunner(
     ILogger<CarrotTransformRunner> logger,
-    IOptions<CarrotCdmSettings> carrotCdmSettings)
+    IOptions<CarrotCdmSettings> carrotCdmSettings,
+    IHostEnvironment env)
 {
     private readonly CarrotCdmSettings _settings = carrotCdmSettings.Value;
-    private const string PythonPath = "/opt/carrot-venv/bin/python";
+    private const string DefaultPythonPath = "/opt/carrot-venv/bin/python";
 
     public async Task<int> RunAsync()
     {
@@ -56,11 +58,21 @@ public sealed class CarrotTransformRunner(
         return 0;
     }
 
+    private string GetPythonPath()
+    {
+        if (env.IsDevelopment() && !string.IsNullOrEmpty(_settings.PythonPath))
+        {
+            return _settings.PythonPath;
+        }
+
+        return DefaultPythonPath;
+    }
+
     private ProcessStartInfo CreateProcessStartInfo()
     {
         return new ProcessStartInfo
         {
-            FileName = PythonPath,
+            FileName = GetPythonPath(),
             Arguments = BuildArguments(),
             RedirectStandardOutput = true,
             RedirectStandardError = true,

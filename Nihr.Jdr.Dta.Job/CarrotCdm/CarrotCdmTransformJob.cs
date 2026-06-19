@@ -108,7 +108,7 @@ public sealed class CarrotCdmTransformJob(
                 tableName,
                 file);
 
-            await omopBulkLoader.BulkLoadAsync(_omop.SchemaName, tableName, file);
+            await omopBulkLoader.BulkLoadFromFileAsync(_omop.SchemaName, tableName, file);
         }
     }
 }

@@ -13,7 +13,8 @@ public class CarrotCdmSettings : IValidatableObject
     [Required] public string DdlFile { get; set; } = null!;
     [Required] public string ConfigFile { get; set; } = null!;
     [Required] public SourceExportSettings SourceExport { get; init; } = null!;
-    
+    public string? PythonPath { get; set; }
+
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
         if (string.IsNullOrWhiteSpace(InputDirectory))
@@ -23,7 +24,7 @@ public class CarrotCdmSettings : IValidatableObject
                 "InputDirectory"
             ]);
         }
-        
+
         if (string.IsNullOrWhiteSpace(RulesFile))
         {
             yield return new ValidationResult("RulesFile is required", (IEnumerable<string>)
@@ -31,7 +32,7 @@ public class CarrotCdmSettings : IValidatableObject
                 "RulesFile"
             ]);
         }
-        
+
         if (string.IsNullOrWhiteSpace(PersonTable))
         {
             yield return new ValidationResult("PersonTable is required", (IEnumerable<string>)
@@ -39,7 +40,7 @@ public class CarrotCdmSettings : IValidatableObject
                 "PersonTable"
             ]);
         }
-        
+
         if (string.IsNullOrWhiteSpace(OutputDirectory))
         {
             yield return new ValidationResult("OutputDirectory is required", (IEnumerable<string>)
@@ -47,7 +48,7 @@ public class CarrotCdmSettings : IValidatableObject
                 "OutputDirectory"
             ]);
         }
-        
+
         if (string.IsNullOrWhiteSpace(DdlFile))
         {
             yield return new ValidationResult("DdlFile is required", (IEnumerable<string>)
@@ -55,7 +56,7 @@ public class CarrotCdmSettings : IValidatableObject
                 "DdlFile"
             ]);
         }
-        
+
         if (string.IsNullOrWhiteSpace(ConfigFile))
         {
             yield return new ValidationResult("ConfigFile is required", (IEnumerable<string>)
