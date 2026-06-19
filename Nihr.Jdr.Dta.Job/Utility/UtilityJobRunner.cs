@@ -15,10 +15,9 @@ public class UtilityJobRunner(
 {
     private static readonly string[] VocabularyFiles = 
     [
-        // "CONCEPT.csv", "VOCABULARY.csv", "DOMAIN.csv", "CONCEPT_CLASS.csv", 
-        // "RELATIONSHIP.csv", "CONCEPT_RELATIONSHIP.csv", "CONCEPT_SYNONYM.csv", 
-        // "CONCEPT_ANCESTOR.csv", "DRUG_STRENGTH.csv"
-        "CONCEPT_SYNONYM.csv", "CONCEPT_ANCESTOR.csv", "DRUG_STRENGTH.csv"
+        "CONCEPT.csv", "VOCABULARY.csv", "DOMAIN.csv", "CONCEPT_CLASS.csv", 
+        "RELATIONSHIP.csv", "CONCEPT_RELATIONSHIP.csv", "CONCEPT_SYNONYM.csv", 
+        "CONCEPT_ANCESTOR.csv", "DRUG_STRENGTH.csv"
     ];
 
     public async Task<int> DeployDdlAsync()
