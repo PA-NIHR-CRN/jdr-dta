@@ -83,11 +83,6 @@ public class UtilityJobRunner(
                     logger.LogWarning(ex, "Failed to delete temp file {LocalPath}", localPath);
                 }
             }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Failed to load {Table} from {S3Url}", tableName, s3Url);
-                return 1;
-            }
         }
 
         return 0;
