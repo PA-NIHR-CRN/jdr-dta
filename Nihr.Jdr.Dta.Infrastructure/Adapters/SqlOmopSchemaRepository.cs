@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Nihr.Jdr.Dta.Domain.Interfaces;
 using Nihr.Jdr.Dta.Infrastructure.Settings;
+using System.Linq;
 
 namespace Nihr.Jdr.Dta.Infrastructure.Adapters;
 
@@ -96,5 +97,26 @@ public sealed class SqlOmopSchemaRepository(
         command.CommandTimeout = 300;
 
         await command.ExecuteNonQueryAsync();
+    }
+
+    public async Task TruncateTablesAsync(string schema, IEnumerable<string> tableNames)
+    {
+        var tableList = tableNames.ToList();
+        if (tableList.Count == 0) return;
+
+        logger.LogInformation(
+            "Truncating tables in schema [{Schema}]: {Tables}",
+            schema,
+            string.Join(", ", tableList));
+
+        await using var connection = new SqlConnection(options.Value.ConnectionString);
+        await connection.OpenAsync();
+
+        foreach (var tableName in tableList)
+        {
+            await using var command = connection.CreateCommand();
+            command.CommandText = $"TRUNCATE TABLE [{schema}].[{tableName}]";
+            await command.ExecuteNonQueryAsync();
+        }
     }
 }

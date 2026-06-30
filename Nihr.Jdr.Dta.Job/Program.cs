@@ -56,9 +56,10 @@ internal class Program
         var carrotRunner = scope.ServiceProvider.GetRequiredService<CarrotCdmTransformJob>();
 
         var loadResult = await job.RunAsync();
+        
         if (loadResult != 0)
         {
-            logger.LogWarning("Skipping CarrotCDM run because job failed");
+            logger.LogError("Skipping CarrotCDM run because job failed, exit code: ${loadResult}", loadResult);
             return loadResult;
         }
 
