@@ -35,7 +35,7 @@ public sealed class CarrotCdmTransformJob(
                 return transformExitCode;
             }
 
-            await RebuildOmopSchemaAsync();
+            await PrepareOmopSchemaAsync();
             await ImportOmopDataAsync();
 
             logger.LogInformation("CarrotCDM transform job completed successfully");
@@ -68,15 +68,19 @@ public sealed class CarrotCdmTransformJob(
         }
     }
 
-    private async Task RebuildOmopSchemaAsync()
+    private async Task PrepareOmopSchemaAsync()
     {
-        logger.LogInformation("Rebuilding OMOP schema {Schema}", _omop.SchemaName);
-
-        await omopSchemaRepository.DropSchemaAsync(_omop.SchemaName);
+        logger.LogInformation("Preparing OMOP schema {Schema}", _omop.SchemaName);
 
         await omopSchemaRepository.CreateSchemaAsync(_omop.SchemaName);
 
-        await omopSchemaRepository.ExecuteDdlAsync(_carrot.DdlFile, _omop.SchemaName);
+        await omopSchemaRepository.TruncateTablesAsync(_omop.SchemaName, new[]
+        {
+            "person",
+            "condition_occurrence",
+            "observation",
+            "measurement"
+        });
     }
 
     private async Task ImportOmopDataAsync()

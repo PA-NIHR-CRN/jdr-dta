@@ -1,4 +1,5 @@
 ## User-specific files
+.junie/
 *.rsuser
 *.suo
 *.user
@@ -39,6 +40,10 @@ _ReSharper*/
 
 ## Docker
 .dockerignore
+
+## Carrot CDM
+CarrotCDM/inputs
+CarrotCDM/output
 
 ## OS generated files
 .DS_Store
