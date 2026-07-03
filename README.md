@@ -1,59 +1,103 @@
-This solution is a .NET-based data processing engine designed to synchronise anonymised data from the Join Dementia Research (JDR) database.
+# JDR DTA
 
-The primary goal is to create a staging version of JDR data in a secure environment. This staged data is then ready to be mapped to the **OMOP Common Data Model (CDM)** using tools such as **Carrot CDM**. Ultimately, this data is intended to be exposed to the **HDRUK** gateway via the **Bunny/Hutch** infrastructure (see [Hutch](https://github.com/Health-Informatics-UoN/hutch)).
+`jdr-dta` is a .NET data pipeline that synchronises JDR source data into a staging database, runs a Carrot CDM transform, and bulk-loads OMOP TSV outputs into a target schema.
 
----
+## What The Job Does
 
-### Solution Overview
+When run with no CLI arguments, the executable performs two stages:
 
-The application is built using a clean, layered architecture to ensure maintainability and scalability. It is designed to run as a containerised job (AWS Fargate) either manually or on a fixed schedule.
+1. Stream source records from the external JDR database, then upsert to staging in batches.
+2. Export staging source tables to CSV, run `carrot-transform`, then import generated OMOP TSV files.
 
-#### Application Layers
+If stage 1 fails, stage 2 is skipped.
 
-*   **Nihr.Jdr.Dta.Job**: 
-    The entry point of the application. It orchestrates the flow of data and manages configuration, logging, and dependency injection. Its main responsibility is to trigger the synchronisation process and manage the lifecycle of the job.
-*   **Nihr.Jdr.Dta.Domain**: 
-    Contains the core domain models and interfaces of the application. This includes the internal data models (such as `Person`, `Diagnosis`, and `Appointment`) and the interfaces that define functionality.
-*   **Nihr.Jdr.Dta.Infrastructure**: 
-    The layer that implements our domain interfaces and communicates with external systems. It contains the actual database logic (MySQL for reading, SQL Server for writing), repository implementations, and integration with secret management services for secure credential retrieval.
+## Solution Structure
 
----
+- `Nihr.Jdr.Dta.Job`: application entry point, DI/configuration, orchestration, utilities.
+- `Nihr.Jdr.Dta.Domain`: domain entities and interfaces.
+- `Nihr.Jdr.Dta.Infrastructure`: repository implementations, EF context/migrations, external integrations.
+- `CarrotCDM/`: Carrot rules/config/input/output assets used by transform workflows.
 
-### How Data Synchronisation Works
+## Prerequisites
 
-The application performs an "Extract, Transform, and Load" (ETL) process using a streaming pattern to move data efficiently between systems.
+- .NET SDK 10 (project targets `net10.0`).
+- Access to the required SQL Server/MySQL/GCP/AWS resources for your environment.
+- For local non-container Carrot runs: Python 3 and `carrot-transform` installed, or set `CarrotCdm:PythonPath` in Development.
 
-#### 1. Data Retrieval
-The process begins by connecting to the external JDR MySQL database. To handle large volumes of data, the application uses a streaming approach. Instead of fetching all records at once, it pulls them from the source one by one. By using a sequential ordering method (sorting by ID), the database can provide a continuous stream of data without the overhead of traditional page-skipping techniques.
+The included Dockerfile installs `carrot-transform` into `/opt/carrot-venv` for container execution.
 
-#### 2. Transformation
-As each record is received, the infrastructure layer transforms the JDR-specific data into our internal domain models as required by the HDRUK team.
+## Configuration
 
-#### 3. Batch Writing
-To ensure the process is efficient, the transformed records are grouped into batches (for example, 500 at a time) before being written to the SQL Server staging database. For every record in a batch, the application checks whether it already exists in the destination. If the record is found, it is updated; otherwise, a new entry is created. After each batch is successfully saved, the application clears its internal tracking state. This ensures that the memory used by the application remains stable.
+Application settings are loaded from standard .NET configuration sources (for example `appsettings.json`, environment variables, and secret providers).
 
----
+For local development, create `Nihr.Jdr.Dta.Job/appsettings.user.json` based on `Nihr.Jdr.Dta.Job/appsettings.json` and provide the same key structure with your local values. Do not commit `appsettings.user.json` to source control.
 
-### Managing Schema
+In deployed environments, secrets are provided by AWS Secrets Manager.
 
-You can use **JetBrains Rider** (or the `dotnet ef` CLI) to manage migrations in this project. When adding a new migration, ensure the following project roles are set:
+Required settings used by startup/runtime:
 
-*   **Startup Project**: `Nihr.Jdr.Dta.Job`
-*   **Migrations Project**: `Nihr.Jdr.Dta.Infrastructure`
-*   **Output Directory**: `DAL/Migrations`
+- `ConnectionStrings:DefaultConnection`
+- `JdrDbSettings:IpAddress`
+- `JdrDbSettings:Username`
+- `JdrDbSettings:DatabaseName`
+- `JdrDbSettings:JdrGcpSettings:ServiceAccountKey`
+- `JdrDbSettings:JdrGcpSettings:FullyQualifiedSecretName`
+- `CarrotCdm:InputDirectory`
+- `CarrotCdm:RulesFile`
+- `CarrotCdm:PersonTable`
+- `CarrotCdm:OutputDirectory`
+- `CarrotCdm:DdlFile`
+- `CarrotCdm:ConfigFile`
+- `CarrotCdm:SourceExport:ConnectionStringName`
+- `CarrotCdm:SourceExport:Tables`
+- `Omop:ConnectionString`
+- `Omop:SchemaName`
 
-If using the command line, the command looks like this:
+Optional:
+
+- `CarrotCdm:PythonPath` (used in Development to override the default python path).
+- `Omop:SkipImportTableNames` (tables to skip when importing TSV outputs).
+
+## Running The Job
+
+Run full pipeline (default behavior, no args):
+
+```bash
+dotnet run --project Nihr.Jdr.Dta.Job
+```
+
+Available utility commands:
+
+```bash
+dotnet run --project Nihr.Jdr.Dta.Job -- --deploy-ddl
+dotnet run --project Nihr.Jdr.Dta.Job -- --load-ref-data s3://your-bucket/path/to/vocabularies/
+```
+
+Supported vocabulary files for `--load-ref-data`:
+
+- `CONCEPT.csv`
+- `VOCABULARY.csv`
+- `DOMAIN.csv`
+- `CONCEPT_CLASS.csv`
+- `RELATIONSHIP.csv`
+- `CONCEPT_RELATIONSHIP.csv`
+- `CONCEPT_SYNONYM.csv`
+- `CONCEPT_ANCESTOR.csv`
+- `DRUG_STRENGTH.csv`
+
+## EF Core Migrations
+
+Use startup project `Nihr.Jdr.Dta.Job` and migrations project `Nihr.Jdr.Dta.Infrastructure`.
+
+Add migration:
 
 ```bash
 dotnet ef migrations add --project Nihr.Jdr.Dta.Infrastructure/Nihr.Jdr.Dta.Infrastructure.csproj --startup-project Nihr.Jdr.Dta.Job/Nihr.Jdr.Dta.Job.csproj --context Nihr.Jdr.Dta.Infrastructure.DAL.JdrDtaDbContext --configuration Debug <MigrationName> --output-dir DAL/Migrations
 ```
 
-#### Deployment and Schema Updates
+Generate idempotent deployment script:
 
-To keep the production and UAT environments in sync without requiring the .NET SDK or EF tools on the target servers, we generate **idempotent SQL scripts**.
+```bash
+dotnet ef migrations script --idempotent --output ./Nihr.Jdr.Dta.Infrastructure/DAL/Deployment/Deploy.sql --project Nihr.Jdr.Dta.Infrastructure --startup-project Nihr.Jdr.Dta.Job
+```
 
-1.  **Script Generation**: We generate a SQL script that includes logic to check which migrations have already been applied before executing new ones.
-    ```bash
-    dotnet ef migrations script --idempotent --output ./Nihr.Jdr.Dta.Infrastructure/DAL/Deployment/Deploy.sql --project Nihr.Jdr.Dta.Infrastructure --startup-project Nihr.Jdr.Dta.Job
-    ```
-2.  **Deployment Pipeline**: This generated `Deploy.sql` script is used within our CI/CD pipeline. The pipeline executes this script against the target database as a pre-deployment step, ensuring the schema is up to date before the new version of the application starts.
